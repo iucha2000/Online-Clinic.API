@@ -1,3 +1,7 @@
+using Online_Clinic.API.Interfaces;
+using Online_Clinic.API.Middlewares;
+using Online_Clinic.API.Models;
+using Online_Clinic.API.Repositories.Oracle;
 
 namespace Online_Clinic.API
 {
@@ -14,7 +18,14 @@ namespace Online_Clinic.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            //Change the class objects when switching to different repository
+            builder.Services.AddScoped<IRepository<Doctor>, PKG_DOCTORS>();
+            builder.Services.AddScoped<IRepository<Patient>, PKG_PATIENTS>();
+            builder.Services.AddScoped<IRepository<Reservation>, PKG_RESERVATIONS>();
+
             var app = builder.Build();
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
