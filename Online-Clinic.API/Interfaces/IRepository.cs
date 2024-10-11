@@ -5,7 +5,7 @@
         void AddEntity(T entity);
         void UpdateEntity(int id, T entity);
         void DeleteEntity(int id);
-        T GetEntity(int id);
+        T GetEntity(int id, bool throwIfNotFound = true);
         List<T> GetEntities();
     }
 }

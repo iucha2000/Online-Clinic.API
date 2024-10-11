@@ -20,7 +20,7 @@ namespace Online_Clinic.API.Repositories.SQL
             throw new NotImplementedException();
         }
 
-        public Reservation GetEntity(int id)
+        public Reservation GetEntity(int id, bool throwIfNotFound = true)
         {
             throw new NotImplementedException();
         }

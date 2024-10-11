@@ -19,7 +19,7 @@ namespace Online_Clinic.API.Repositories.SQL
             throw new NotImplementedException();
         }
 
-        public Patient GetEntity(int id)
+        public Patient GetEntity(int id, bool throwIfNotFound = true)
         {
             throw new NotImplementedException();
         }
@@ -29,7 +29,12 @@ namespace Online_Clinic.API.Repositories.SQL
             throw new NotImplementedException();
         }
 
-        public Patient GetByEmail(string email)
+        public Patient GetByEmail(string email, bool throwIfNotFound = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Patient GetByPersonalId(string personalId, bool throwIfNotFound = true)
         {
             throw new NotImplementedException();
         }

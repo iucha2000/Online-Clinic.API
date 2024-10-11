@@ -22,7 +22,6 @@ namespace Online_Clinic.API.Controllers
         public IActionResult AddPatient(Patient patient)
         {
             _patientRepository.AddEntity(patient);
-            //TODO handle exceptions
             return Ok();
         }
 
@@ -30,7 +29,6 @@ namespace Online_Clinic.API.Controllers
         public IActionResult UpdatePatient(int id, Patient patient)
         {
             _patientRepository.UpdateEntity(id, patient);
-            //TODO handle exceptions
             return Ok();
         }
 
@@ -38,7 +36,6 @@ namespace Online_Clinic.API.Controllers
         public IActionResult DeletePatient(int id)
         {
             _patientRepository.DeleteEntity(id);
-            //TODO handle exceptions
             return Ok();
         }
 
@@ -46,7 +43,6 @@ namespace Online_Clinic.API.Controllers
         public IActionResult GetPatient(int id)
         {
             Patient patient = _patientRepository.GetEntity(id);
-            //TODO handle exceptions
             return Ok(patient);
         }
 
@@ -54,7 +50,6 @@ namespace Online_Clinic.API.Controllers
         public IActionResult GetAllPatients()
         {
             List<Patient> patients = _patientRepository.GetEntities();
-            //TODO handle exceptions
             return Ok(patients);
         }
     }

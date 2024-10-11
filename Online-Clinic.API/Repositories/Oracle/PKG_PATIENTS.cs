@@ -1,4 +1,6 @@
-﻿using Online_Clinic.API.Enums;
+﻿using My_Login_App.API.Exceptions;
+using Online_Clinic.API.Enums;
+using Online_Clinic.API.Exceptions;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
 using Oracle.ManagedDataAccess.Client;
@@ -15,6 +17,18 @@ namespace Online_Clinic.API.Repositories.Oracle
 
         public void AddEntity(Patient entity)
         {
+            Patient existingPatient = GetByEmail(entity.Email, throwIfNotFound: false);
+            if(existingPatient != null)
+            {
+                throw new UserAlreadyExistsException("User with given email already exists");
+            }
+
+            existingPatient = GetByPersonalId(entity.Personal_Id, throwIfNotFound: false);
+            if(existingPatient != null)
+            {
+                throw new UserAlreadyExistsException("User with given personalId already exists");
+            }
+
             OracleConnection conn = new OracleConnection();
             conn.ConnectionString = ConnStr;
 
@@ -40,6 +54,20 @@ namespace Online_Clinic.API.Repositories.Oracle
 
         public void UpdateEntity(int id, Patient entity)
         {
+            Patient existingPatient = GetEntity(id);
+
+            existingPatient = GetByEmail(entity.Email, throwIfNotFound: false);
+            if (existingPatient != null)
+            {
+                throw new UserAlreadyExistsException("User with given email already exists");
+            }
+
+            existingPatient = GetByPersonalId(entity.Personal_Id, throwIfNotFound: false);
+            if (existingPatient != null)
+            {
+                throw new UserAlreadyExistsException("User with given personalId already exists");
+            }
+
             OracleConnection conn = new OracleConnection();
             conn.ConnectionString = ConnStr;
 
@@ -66,6 +94,8 @@ namespace Online_Clinic.API.Repositories.Oracle
 
         public void DeleteEntity(int id)
         {
+            Patient existingPatient = GetEntity(id);
+
             OracleConnection conn = new OracleConnection();
             conn.ConnectionString = ConnStr;
 
@@ -83,7 +113,7 @@ namespace Online_Clinic.API.Repositories.Oracle
             conn.Close();
         }
 
-        public Patient GetEntity(int id)
+        public Patient GetEntity(int id, bool throwIfNotFound = true)
         {
             Patient patient = null;
 
@@ -115,6 +145,10 @@ namespace Online_Clinic.API.Repositories.Oracle
                     ActivationCode = int.Parse(reader["activationcode"].ToString()),
                     Role = (Role)int.Parse(reader["role"].ToString())
                 };
+            }
+            else if(throwIfNotFound)
+            {
+                throw new UserNotFoundException($"User with id:'{id}' does not exist");
             }
 
             conn.Close();
@@ -160,7 +194,7 @@ namespace Online_Clinic.API.Repositories.Oracle
             return patients;
         }
 
-        public Patient GetByEmail(string email)
+        public Patient GetByEmail(string email, bool throwIfNotFound = true)
         {
             Patient patient = null;
 
@@ -192,6 +226,53 @@ namespace Online_Clinic.API.Repositories.Oracle
                     ActivationCode = int.Parse(reader["activationcode"].ToString()),
                     Role = (Role)int.Parse(reader["role"].ToString())
                 };
+            }
+            else if (throwIfNotFound)
+            {
+                throw new UserNotFoundException($"User with email:'{email}' does not exist");
+            }
+
+            conn.Close();
+
+            return patient;
+        }
+
+        public Patient GetByPersonalId(string personalId, bool throwIfNotFound = true)
+        {
+            Patient patient = null;
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_PATIENTS.get_patient_by_personal_id";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = personalId;
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+            reader.Read();
+            if (reader.HasRows)
+            {
+                patient = new Patient()
+                {
+                    Id = int.Parse(reader["id"].ToString()),
+                    FirstName = reader["firstname"].ToString(),
+                    LastName = reader["lastname"].ToString(),
+                    Email = reader["email"].ToString(),
+                    Password = reader["password"].ToString(),
+                    Personal_Id = reader["personal_id"].ToString(),
+                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
+                    Role = (Role)int.Parse(reader["role"].ToString())
+                };
+            }
+            else if (throwIfNotFound)
+            {
+                throw new UserNotFoundException($"User with personalId:'{personalId}' does not exist");
             }
 
             conn.Close();

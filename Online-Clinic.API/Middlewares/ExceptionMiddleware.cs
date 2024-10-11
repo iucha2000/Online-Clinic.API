@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using My_Login_App.API.Exceptions;
+using System.Net;
 using System.Text.Json;
 
 namespace Online_Clinic.API.Middlewares
@@ -26,17 +27,25 @@ namespace Online_Clinic.API.Middlewares
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            int statusCode = 500;
+            string message = "An unexpected error occurred.";
 
-            var response = new
+            if (exception is CustomException customException)
             {
-                context.Response.StatusCode,
-                Message = "Internal Server Error from the custom middleware.",
-                Detailed = exception.Message
+                statusCode = customException.StatusCode;
+                message = customException.ErrorMessage;
+            }
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = statusCode;
+
+            var errorResponse = new
+            {
+                StatusCode = statusCode,
+                Message = message,
             };
 
-            var jsonResponse = JsonSerializer.Serialize(response);
+            var jsonResponse = JsonSerializer.Serialize(errorResponse);
 
             return context.Response.WriteAsync(jsonResponse);
         }

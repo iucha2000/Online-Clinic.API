@@ -24,7 +24,7 @@ namespace Online_Clinic.API.Repositories.Oracle
             throw new NotImplementedException();
         }
 
-        public Doctor GetEntity(int id)
+        public Doctor GetEntity(int id, bool throwIfNotFound = true)
         {
             throw new NotImplementedException();
         }
