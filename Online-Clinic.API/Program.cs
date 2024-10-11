@@ -5,6 +5,7 @@ using My_Login_App.API.Auth;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Middlewares;
 using Online_Clinic.API.Models;
+using Online_Clinic.API.Profiles;
 using Online_Clinic.API.Repositories.Oracle;
 using System.Text;
 
@@ -17,7 +18,7 @@ namespace Online_Clinic.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
