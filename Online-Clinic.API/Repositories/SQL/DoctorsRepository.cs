@@ -3,7 +3,7 @@ using Online_Clinic.API.Models;
 
 namespace Online_Clinic.API.Repositories.SQL
 {
-    public class DoctorsRepository : IRepository<Doctor>
+    public class DoctorsRepository : IDoctorRepository
     {
         public void AddEntity(Doctor entity)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
@@ -10,9 +11,9 @@ namespace Online_Clinic.API.Controllers
     [ApiController]
     public class PatientsController : ControllerBase
     {
-        private readonly IRepository<Patient> _patientRepository;
+        private readonly IPatientRepository _patientRepository;
 
-        public PatientsController(IRepository<Patient> patientRepository)
+        public PatientsController(IPatientRepository patientRepository)
         {
             _patientRepository = patientRepository;   
         }

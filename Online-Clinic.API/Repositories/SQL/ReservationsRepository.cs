@@ -3,7 +3,7 @@ using Online_Clinic.API.Models;
 
 namespace Online_Clinic.API.Repositories.SQL
 {
-    public class ReservationsRepository : IRepository<Reservation>
+    public class ReservationsRepository : IReservationRepository
     {
         public void AddEntity(Reservation entity)
         {

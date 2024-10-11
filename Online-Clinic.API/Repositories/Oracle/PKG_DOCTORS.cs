@@ -3,7 +3,7 @@ using Online_Clinic.API.Models;
 
 namespace Online_Clinic.API.Repositories.Oracle
 {
-    public class PKG_DOCTORS : PKG_BASE, IRepository<Doctor>
+    public class PKG_DOCTORS : PKG_BASE, IDoctorRepository
     {
         public PKG_DOCTORS(IConfiguration configuration) : base(configuration)
         {

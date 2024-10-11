@@ -1,7 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using My_Login_App.API.Auth;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Middlewares;
 using Online_Clinic.API.Models;
 using Online_Clinic.API.Repositories.Oracle;
+using System.Text;
 
 namespace Online_Clinic.API
 {
@@ -19,9 +24,66 @@ namespace Online_Clinic.API
             builder.Services.AddSwaggerGen();
 
             //Change the class objects when switching to different repository
-            builder.Services.AddScoped<IRepository<Doctor>, PKG_DOCTORS>();
-            builder.Services.AddScoped<IRepository<Patient>, PKG_PATIENTS>();
-            builder.Services.AddScoped<IRepository<Reservation>, PKG_RESERVATIONS>();
+            builder.Services.AddScoped<IJwtManager, JwtManager>();
+            builder.Services.AddScoped<IDoctorRepository, PKG_DOCTORS>();
+            builder.Services.AddScoped<IPatientRepository, PKG_PATIENTS>();
+            builder.Services.AddScoped<IReservationRepository, PKG_RESERVATIONS>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllCors", config =>
+                {
+                    config.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+
+                });
+            });
+
+            builder.Services.AddSwaggerGen(option =>
+            {
+                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer"
+                });
+                option.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[]{ }
+                    }
+                });
+            });
+
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+            {
+                var key = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
+                o.SaveToken = true;
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+            });
 
             var app = builder.Build();
 
@@ -34,8 +96,9 @@ namespace Online_Clinic.API
                 app.UseSwaggerUI();
             }
 
-            app.UseAuthorization();
+            app.UseCors("AllowAllCors");
 
+            app.UseAuthorization();
 
             app.MapControllers();
 

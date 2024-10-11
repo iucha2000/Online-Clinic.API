@@ -3,7 +3,7 @@ using Online_Clinic.API.Models;
 
 namespace Online_Clinic.API.Repositories.SQL
 {
-    public class PatientsRepository : IRepository<Patient>
+    public class PatientsRepository : IPatientRepository
     {
         public void AddEntity(Patient entity)
         {
@@ -25,6 +25,11 @@ namespace Online_Clinic.API.Repositories.SQL
         }
 
         public List<Patient> GetEntities()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Patient GetByEmail(string email)
         {
             throw new NotImplementedException();
         }

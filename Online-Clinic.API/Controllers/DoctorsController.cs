@@ -10,8 +10,8 @@ namespace Online_Clinic.API.Controllers
     [ApiController]
     public class DoctorsController : ControllerBase
     {
-        private readonly IRepository<Doctor> _doctorRepository;
-        public DoctorsController(IRepository<Doctor> doctorRepository)
+        private readonly IDoctorRepository _doctorRepository;
+        public DoctorsController(IDoctorRepository doctorRepository)
         {
             _doctorRepository = doctorRepository;
         }

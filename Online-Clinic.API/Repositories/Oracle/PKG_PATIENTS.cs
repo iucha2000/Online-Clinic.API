@@ -7,7 +7,7 @@ using System.Reflection.PortableExecutable;
 
 namespace Online_Clinic.API.Repositories.Oracle
 {
-    public class PKG_PATIENTS : PKG_BASE, IRepository<Patient>
+    public class PKG_PATIENTS : PKG_BASE, IPatientRepository
     {
         public PKG_PATIENTS(IConfiguration configuration) : base(configuration)
         {
@@ -158,6 +158,45 @@ namespace Online_Clinic.API.Repositories.Oracle
 
             conn.Close();
             return patients;
+        }
+
+        public Patient GetByEmail(string email)
+        {
+            Patient patient = null;
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_PATIENTS.get_patient_by_email";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = email;
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+            reader.Read();
+            if (reader.HasRows)
+            {
+                patient = new Patient()
+                {
+                    Id = int.Parse(reader["id"].ToString()),
+                    FirstName = reader["firstname"].ToString(),
+                    LastName = reader["lastname"].ToString(),
+                    Email = reader["email"].ToString(),
+                    Password = reader["password"].ToString(),
+                    Personal_Id = reader["personal_id"].ToString(),
+                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
+                    Role = (Role)int.Parse(reader["role"].ToString())
+                };
+            }
+
+            conn.Close();
+
+            return patient;
         }
     }
 }

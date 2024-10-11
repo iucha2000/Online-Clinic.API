@@ -10,9 +10,9 @@ namespace Online_Clinic.API.Controllers
     [ApiController]
     public class ReservationsController : ControllerBase
     {
-        private readonly IRepository<Reservation> _reservationsRepository;
+        private readonly IReservationRepository _reservationsRepository;
 
-        public ReservationsController(IRepository<Reservation> reservationsRepository)
+        public ReservationsController(IReservationRepository reservationsRepository)
         {
             _reservationsRepository = reservationsRepository;
         }
