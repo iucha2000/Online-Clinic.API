@@ -1,11 +1,9 @@
-﻿using My_Login_App.API.Exceptions;
-using Online_Clinic.API.Enums;
+﻿using Online_Clinic.API.Enums;
 using Online_Clinic.API.Exceptions;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
-using System.Reflection.PortableExecutable;
 
 namespace Online_Clinic.API.Repositories.Oracle
 {

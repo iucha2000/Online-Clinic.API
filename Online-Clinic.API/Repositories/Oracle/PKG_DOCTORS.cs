@@ -1,5 +1,9 @@
-﻿using Online_Clinic.API.Interfaces;
+﻿using Online_Clinic.API.Enums;
+using Online_Clinic.API.Exceptions;
+using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
+using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Online_Clinic.API.Repositories.Oracle
 {
@@ -11,27 +15,287 @@ namespace Online_Clinic.API.Repositories.Oracle
 
         public void AddEntity(Doctor entity)
         {
-            throw new NotImplementedException();
+            Doctor existingDoctor = GetByEmail(entity.Email, throwIfNotFound: false);
+            if (existingDoctor != null)
+            {
+                throw new UserAlreadyExistsException("Doctor with given email already exists");
+            }
+
+            existingDoctor = GetByPersonalId(entity.Personal_Id, throwIfNotFound: false);
+            if (existingDoctor != null)
+            {
+                throw new UserAlreadyExistsException("Doctor with given personalId already exists");
+            }
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.add_doctor";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_firstname", OracleDbType.Varchar2).Value = entity.FirstName;
+            cmd.Parameters.Add("v_lastname", OracleDbType.Varchar2).Value = entity.LastName;
+            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = entity.Email;
+            cmd.Parameters.Add("v_password", OracleDbType.Varchar2).Value = entity.Password;
+            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = entity.Personal_Id;
+            cmd.Parameters.Add("v_activationcode", OracleDbType.Int32).Value = entity.ActivationCode;
+            cmd.Parameters.Add("v_role", OracleDbType.Int32).Value = entity.Role;
+            cmd.Parameters.Add("v_category", OracleDbType.Int32).Value = entity.Category;
+            cmd.Parameters.Add("v_rating", OracleDbType.Int32).Value = entity.Rating;
+            cmd.Parameters.Add("v_image", OracleDbType.Blob).Value = entity.Image;
+            cmd.Parameters.Add("v_cv", OracleDbType.Blob).Value = entity.CV;
+
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
         }
 
         public void UpdateEntity(int id, Doctor entity)
         {
-            throw new NotImplementedException();
+            Doctor existingDoctor = GetEntity(id);
+
+            existingDoctor = GetByEmail(entity.Email, throwIfNotFound: false);
+            if (existingDoctor != null)
+            {
+                throw new UserAlreadyExistsException("Doctor with given email already exists");
+            }
+
+            existingDoctor = GetByPersonalId(entity.Personal_Id, throwIfNotFound: false);
+            if (existingDoctor != null)
+            {
+                throw new UserAlreadyExistsException("Doctor with given personalId already exists");
+            }
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.update_doctor";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = id;
+            cmd.Parameters.Add("v_firstname", OracleDbType.Varchar2).Value = entity.FirstName;
+            cmd.Parameters.Add("v_lastname", OracleDbType.Varchar2).Value = entity.LastName;
+            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = entity.Email;
+            cmd.Parameters.Add("v_password", OracleDbType.Varchar2).Value = entity.Password;
+            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = entity.Personal_Id;
+            cmd.Parameters.Add("v_activationcode", OracleDbType.Int32).Value = entity.ActivationCode;
+            cmd.Parameters.Add("v_role", OracleDbType.Int32).Value = entity.Role;
+            cmd.Parameters.Add("v_category", OracleDbType.Int32).Value = entity.Category;
+            cmd.Parameters.Add("v_rating", OracleDbType.Int32).Value = entity.Rating;
+            cmd.Parameters.Add("v_image", OracleDbType.Blob).Value = entity.Image;
+            cmd.Parameters.Add("v_cv", OracleDbType.Blob).Value = entity.CV;
+
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
         }
 
         public void DeleteEntity(int id)
         {
-            throw new NotImplementedException();
+            Doctor existingDoctor = GetEntity(id);
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.delete_doctor";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = id;
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
         }
 
         public Doctor GetEntity(int id, bool throwIfNotFound = true)
         {
-            throw new NotImplementedException();
+            Doctor doctor = null;
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_doctor_by_id";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = id;
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+
+            reader.Read();
+            if (reader.HasRows)
+            {
+                doctor = new Doctor()
+                {
+                    Id = id,
+                    FirstName = reader["firstname"].ToString(),
+                    LastName = reader["lastname"].ToString(),
+                    Email = reader["email"].ToString(),
+                    Password = reader["password"].ToString(),
+                    Personal_Id = reader["personal_id"].ToString(),
+                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
+                    Role = (Role)int.Parse(reader["role"].ToString()),
+                    Category = (Category)int.Parse(reader["category"].ToString()),
+                    Rating = int.Parse(reader["rating"].ToString())
+                };
+            }
+            else if (throwIfNotFound)
+            {
+                throw new UserNotFoundException($"Doctor with id:'{id}' does not exist");
+            }
+
+            conn.Close();
+
+            return doctor;
         }
 
         public List<Doctor> GetEntities()
         {
-            throw new NotImplementedException();
+            List<Doctor> doctors = new List<Doctor>();
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_all_doctors";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Doctor doctor = new Doctor()
+                {
+                    Id = int.Parse(reader["id"].ToString()),
+                    FirstName = reader["firstname"].ToString(),
+                    LastName = reader["lastname"].ToString(),
+                    Email = reader["email"].ToString(),
+                    Password = reader["password"].ToString(),
+                    Personal_Id = reader["personal_id"].ToString(),
+                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
+                    Role = (Role)int.Parse(reader["role"].ToString()),
+                    Category = (Category)int.Parse(reader["category"].ToString()),
+                    Rating = int.Parse(reader["rating"].ToString())
+                };
+
+                doctors.Add(doctor);
+            }
+
+            conn.Close();
+            return doctors;
+        }
+
+        public Doctor GetByEmail(string email, bool throwIfNotFound = true)
+        {
+            Doctor doctor = null;
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_doctor_by_email";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = email;
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+            reader.Read();
+            if (reader.HasRows)
+            {
+                doctor = new Doctor()
+                {
+                    Id = int.Parse(reader["id"].ToString()),
+                    FirstName = reader["firstname"].ToString(),
+                    LastName = reader["lastname"].ToString(),
+                    Email = reader["email"].ToString(),
+                    Password = reader["password"].ToString(),
+                    Personal_Id = reader["personal_id"].ToString(),
+                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
+                    Role = (Role)int.Parse(reader["role"].ToString()),
+                    Category = (Category)int.Parse(reader["category"].ToString()),
+                    Rating = int.Parse(reader["rating"].ToString())
+                };
+            }
+            else if (throwIfNotFound)
+            {
+                throw new UserNotFoundException($"Doctor with email:'{email}' does not exist");
+            }
+
+            conn.Close();
+
+            return doctor;
+
+        }
+
+        public Doctor GetByPersonalId(string personalId, bool throwIfNotFound = true)
+        {
+            Doctor doctor = null;
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_doctor_by_personal_id";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = personalId;
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+            reader.Read();
+            if (reader.HasRows)
+            {
+                doctor = new Doctor()
+                {
+                    Id = int.Parse(reader["id"].ToString()),
+                    FirstName = reader["firstname"].ToString(),
+                    LastName = reader["lastname"].ToString(),
+                    Email = reader["email"].ToString(),
+                    Password = reader["password"].ToString(),
+                    Personal_Id = reader["personal_id"].ToString(),
+                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
+                    Role = (Role)int.Parse(reader["role"].ToString()),
+                    Category = (Category)int.Parse(reader["category"].ToString()),
+                    Rating = int.Parse(reader["rating"].ToString())
+                };
+            }
+            else if (throwIfNotFound)
+            {
+                throw new UserNotFoundException($"Doctor with personalId:'{personalId}' does not exist");
+            }
+
+            conn.Close();
+
+            return doctor;
         }
     }
 }

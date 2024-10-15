@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
-using Online_Clinic.API.Repositories.SQL;
 
 namespace Online_Clinic.API.Controllers
 {

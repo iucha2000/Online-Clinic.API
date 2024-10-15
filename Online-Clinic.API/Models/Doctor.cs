@@ -7,8 +7,8 @@ namespace Online_Clinic.API.Models
     {
         public Category Category { get; set; }
         public int Rating { get; set; }
-        public byte[] Image { get; set; }
-        public byte[] CV { get; set; }
+        public byte[]? Image { get; set; }
+        public byte[]? CV { get; set; }
         public Reservation[]? Reservations { get; set; }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Online_Clinic.API.DTOs;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
 using System.Numerics;
@@ -11,24 +13,27 @@ namespace Online_Clinic.API.Controllers
     public class DoctorsController : ControllerBase
     {
         private readonly IDoctorRepository _doctorRepository;
-        public DoctorsController(IDoctorRepository doctorRepository)
+        private readonly IMapper _mapper;
+
+        public DoctorsController(IDoctorRepository doctorRepository, IMapper mapper)
         {
             _doctorRepository = doctorRepository;
+            _mapper = mapper;
         }
 
         [HttpPost("Add-Doctor")]
-        public IActionResult AddDoctor(Doctor doctor)
+        public IActionResult AddDoctor(DoctorRequest doctorDto)
         {
-            _doctorRepository.AddEntity(doctor);
-            //TODO handle exceptions
+            var doctor = _mapper.Map<Doctor>(doctorDto);
+             _doctorRepository.AddEntity(doctor);
             return Ok();
         }
 
         [HttpPut("Update-Doctor/{id}")]
-        public IActionResult UpdateDoctor(int id, Doctor doctor)
+        public IActionResult UpdateDoctor(int id, DoctorRequest doctorDto)
         {
+            var doctor = _mapper.Map<Doctor>(doctorDto);
             _doctorRepository.UpdateEntity(id, doctor);
-            //TODO handle exceptions
             return Ok();
         }
 
@@ -36,7 +41,6 @@ namespace Online_Clinic.API.Controllers
         public IActionResult DeleteDoctor(int id)
         {
             _doctorRepository.DeleteEntity(id);
-            //TODO handle exceptions
             return Ok();
         }
 
@@ -44,16 +48,28 @@ namespace Online_Clinic.API.Controllers
         public IActionResult GetDoctor(int id)
         {
             Doctor doctor = _doctorRepository.GetEntity(id);
-            //TODO handle exceptions
-            return Ok(doctor);
+            var doctorDto = _mapper.Map<DoctorResponse>(doctor);
+            return Ok(doctorDto);
         }
 
         [HttpGet("Get-All-Doctors")]
         public IActionResult GetAllDoctors()
         {
             List<Doctor> doctors = _doctorRepository.GetEntities();
-            //TODO handle exceptions
-            return Ok(doctors);
+            var doctorDtos = _mapper.Map<List<DoctorResponse>>(doctors);
+            return Ok(doctorDtos);
+        }
+
+        [HttpPost("Upload-Photo/{doctorId}")]
+        public IActionResult UploadPhoto(int doctorId, IFormFile file)
+        {
+            return Ok();
+        }
+
+        [HttpPost("Upload-CV/{doctorId}")]
+        public IActionResult UploadCV(int doctorId, IFormFile file)
+        {
+            return Ok();
         }
     }
 }
