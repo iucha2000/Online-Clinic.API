@@ -4,6 +4,8 @@ using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
+using static System.Net.Mime.MediaTypeNames;
+using System.Linq;
 
 namespace Online_Clinic.API.Repositories.Oracle
 {
@@ -296,6 +298,88 @@ namespace Online_Clinic.API.Repositories.Oracle
             conn.Close();
 
             return doctor;
+        }
+
+        public void UploadImage(int doctorId, IFormFile image)
+        {
+            Doctor existingDoctor = GetEntity(doctorId);
+
+            if (image == null || image.Length == 0)
+            {
+                throw new FileUploadException("Please upload a valid file");
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                throw new FileUploadException("Invalid file type. Allowed types are: .jpg, .jpeg, .png, .gif");
+            }
+
+            byte[] photoData;
+            using (var ms = new MemoryStream())
+            {
+                image.CopyTo(ms);
+                photoData = ms.ToArray();
+            }
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.add_image";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = doctorId;
+            cmd.Parameters.Add("v_image", OracleDbType.Blob).Value = photoData;
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
+        }
+
+        public void UploadCV(int doctorId, IFormFile cv)
+        {
+            Doctor existingDoctor = GetEntity(doctorId);
+
+            if (cv == null || cv.Length == 0)
+            {
+                throw new FileUploadException("Please upload a valid file");
+            }
+
+            var allowedExtensions = new[] {".txt", ".doc", ".docx", ".pdf"};
+            var fileExtension = Path.GetExtension(cv.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                throw new FileUploadException("Invalid file type. Allowed types are: .txt, .doc, .docx, .pdf");
+            }
+
+            byte[] cvData;
+            using (var ms = new MemoryStream())
+            {
+                cv.CopyTo(ms);
+                cvData = ms.ToArray();
+            }
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.add_cv";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = doctorId;
+            cmd.Parameters.Add("v_cv", OracleDbType.Blob).Value = cvData;
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
         }
     }
 }

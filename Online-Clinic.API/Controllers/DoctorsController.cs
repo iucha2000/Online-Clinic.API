@@ -60,15 +60,17 @@ namespace Online_Clinic.API.Controllers
             return Ok(doctorDtos);
         }
 
-        [HttpPost("Upload-Photo/{doctorId}")]
-        public IActionResult UploadPhoto(int doctorId, IFormFile file)
+        [HttpPost("Upload-Image/{doctorId}")]
+        public IActionResult UploadImage(int doctorId, IFormFile file)
         {
+            _doctorRepository.UploadImage(doctorId, file);
             return Ok();
         }
 
         [HttpPost("Upload-CV/{doctorId}")]
         public IActionResult UploadCV(int doctorId, IFormFile file)
         {
+            _doctorRepository.UploadCV(doctorId, file);
             return Ok();
         }
     }
