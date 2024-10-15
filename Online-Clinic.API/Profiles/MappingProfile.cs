@@ -15,6 +15,10 @@ namespace Online_Clinic.API.Profiles
             CreateMap<Doctor, DoctorResponse>();
 
             CreateMap<DoctorRequest, Doctor>();
+
+            CreateMap<ReservationDto, Reservation>();
+
+            CreateMap<Reservation, ReservationDto>();
         }
     }
 }

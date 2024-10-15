@@ -146,7 +146,7 @@ namespace Online_Clinic.API.Repositories.Oracle
             }
             else if(throwIfNotFound)
             {
-                throw new UserNotFoundException($"User with id:'{id}' does not exist");
+                throw new UserNotFoundException($"Patient with id:'{id}' does not exist");
             }
 
             conn.Close();

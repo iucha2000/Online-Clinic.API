@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Online_Clinic.API.DTOs;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
 
@@ -10,25 +12,27 @@ namespace Online_Clinic.API.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly IReservationRepository _reservationsRepository;
+        private readonly IMapper _mapper;
 
-        public ReservationsController(IReservationRepository reservationsRepository)
+        public ReservationsController(IReservationRepository reservationsRepository, IMapper mapper)
         {
             _reservationsRepository = reservationsRepository;
+            _mapper = mapper;
         }
 
         [HttpPost("Add-Reservation")]
-        public IActionResult AddReservation(Reservation reservation)
+        public IActionResult AddReservation(ReservationDto reservationDto)
         {
+            var reservation = _mapper.Map<Reservation>(reservationDto);
             _reservationsRepository.AddEntity(reservation);
-            //TODO handle exceptions
             return Ok();
         }
 
         [HttpPut("Update-Reservation/{id}")]
-        public IActionResult UpdateReservation(int id, Reservation reservation)
+        public IActionResult UpdateReservation(int id, ReservationDto reservationDto)
         {
+            var reservation = _mapper.Map<Reservation>(reservationDto);
             _reservationsRepository.UpdateEntity(id, reservation);
-            //TODO handle exceptions
             return Ok();
         }
 
@@ -36,7 +40,6 @@ namespace Online_Clinic.API.Controllers
         public IActionResult DeleteReservation(int id)
         {
             _reservationsRepository.DeleteEntity(id);
-            //TODO handle exceptions
             return Ok();
         }
 
@@ -44,7 +47,6 @@ namespace Online_Clinic.API.Controllers
         public IActionResult GetReservation(int id)
         {
             Reservation reservation = _reservationsRepository.GetEntity(id);
-            //TODO handle exceptions
             return Ok(reservation);
         }
 
@@ -52,7 +54,20 @@ namespace Online_Clinic.API.Controllers
         public IActionResult GetAllReservations()
         {
             List<Reservation> reservations = _reservationsRepository.GetEntities();
-            //TODO handle exceptions
+            return Ok(reservations);
+        }
+
+        [HttpGet("Get-Reservations-By-Patient/{patientId}")]
+        public IActionResult GetReservationsByPatientId(int patientId)
+        {
+            List<Reservation> reservations = _reservationsRepository.GetByPatientId(patientId);
+            return Ok(reservations);
+        }
+
+        [HttpGet("Get-Reservations-By-Doctor/{doctorId}")]
+        public IActionResult GetReservationsByDoctorId(int doctorId)
+        {
+            List<Reservation> reservations = _reservationsRepository.GetByDoctorId(doctorId);
             return Ok(reservations);
         }
     }
