@@ -10,6 +10,10 @@ namespace Online_Clinic.API.Interfaces
 
         void UploadImage(int doctorId, IFormFile image);
 
+        byte[] GetImage(int doctorId);
+
         void UploadCV(int doctorId, IFormFile cv);
+
+        byte[] GetCV(int doctorId);
     }
 }

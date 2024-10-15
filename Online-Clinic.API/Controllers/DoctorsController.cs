@@ -67,11 +67,33 @@ namespace Online_Clinic.API.Controllers
             return Ok();
         }
 
+        [HttpGet("Get-Image/{doctorId}")]
+        public IActionResult GetImage(int doctorId)
+        {
+            byte[] photoData = _doctorRepository.GetImage(doctorId);
+
+            string fileType = "image/jpeg"; 
+            var fileName = $"Doctor_{doctorId}.jpg"; 
+
+            return File(photoData, fileType, fileName);
+        }
+
         [HttpPost("Upload-CV/{doctorId}")]
         public IActionResult UploadCV(int doctorId, IFormFile file)
         {
             _doctorRepository.UploadCV(doctorId, file);
             return Ok();
+        }
+
+        [HttpGet("Get-CV/{doctorId}")]
+        public IActionResult GetCV(int doctorId)
+        {
+            byte[] cvData = _doctorRepository.GetCV(doctorId);
+
+            string fileType = "application/pdf";
+            var fileName = $"Doctor_{doctorId}_CV.pdf";
+
+            return File(cvData, fileType, fileName);
         }
     }
 }

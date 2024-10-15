@@ -6,6 +6,7 @@ using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using static System.Net.Mime.MediaTypeNames;
 using System.Linq;
+using Oracle.ManagedDataAccess.Types;
 
 namespace Online_Clinic.API.Repositories.Oracle
 {
@@ -341,6 +342,43 @@ namespace Online_Clinic.API.Repositories.Oracle
             conn.Close();
         }
 
+        public byte[] GetImage(int doctorId)
+        {
+            Doctor existingDoctor = GetEntity(doctorId);
+
+            byte[] imageData = null;
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_image_by_doctor_id";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = doctorId;
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+
+            reader.Read();
+            if (reader.HasRows)
+            {
+                if (reader["image"] != DBNull.Value)
+                {
+                    imageData = (byte[])reader["image"];
+                }
+                else
+                {
+                    throw new FileDownloadException($"No image file was found for doctor with id: {doctorId}");
+                }
+            }
+
+            return imageData;
+        }
+
         public void UploadCV(int doctorId, IFormFile cv)
         {
             Doctor existingDoctor = GetEntity(doctorId);
@@ -380,6 +418,43 @@ namespace Online_Clinic.API.Repositories.Oracle
             cmd.ExecuteNonQuery();
 
             conn.Close();
+        }
+
+        public byte[] GetCV(int doctorId)
+        {
+            Doctor existingDoctor = GetEntity(doctorId);
+
+            byte[] cvData = null;
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_cv_by_doctor_id";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = doctorId;
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+
+            reader.Read();
+            if (reader.HasRows)
+            {
+                if (reader["cv"] != DBNull.Value)
+                {
+                    cvData = (byte[])reader["cv"];
+                }
+                else
+                {
+                    throw new FileDownloadException($"No cv file was found for doctor with id: {doctorId}");
+                }
+            }
+
+            return cvData;
         }
     }
 }
