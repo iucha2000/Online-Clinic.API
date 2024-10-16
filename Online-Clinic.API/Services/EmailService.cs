@@ -10,24 +10,45 @@ namespace Online_Clinic.API.Services
     public class EmailService : IEmailService
     {
         private readonly IEmailConfirmationRepository _confirmationRepository;
-        //private readonly string _sendGridApiKey;
+        private readonly string _sendGridApiKey;
+        string emailBodyTemplate = @"
+        <!DOCTYPE html>
+        <html lang=""en"">
+        <head>
+            <meta charset=""UTF-8"">
+            <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+            <style>
+                body {{ font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }}
+                .container {{ max-width: 600px; margin: auto; background: #fff; border-radius: 5px; padding: 20px; }}
+                .header {{ background: #007bff; color: #fff; text-align: center; padding: 10px; }}
+                .code {{ font-size: 24px; font-weight: bold; color: #007bff; }}
+            </style>
+        </head>
+        <body>
+            <div class=""container"">
+                <div class=""header""><h1>Confirmation Code</h1></div>
+                <p>Your code is <span class=""code"">{0}</span>.</p>
+                <p>It is valid for 2 minutes.</p>
+            </div>
+        </body>
+        </html>";
 
-        public EmailService(IEmailConfirmationRepository confirmationRepository)
+        public EmailService(IEmailConfirmationRepository confirmationRepository, IConfiguration configuration)
         {
             _confirmationRepository = confirmationRepository;
-            //_sendGridApiKey = "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";
+            _sendGridApiKey = configuration["SendGridApiKey"];
         }
 
-        public async Task SendEmailAsync(string toEmail, string subject, string body)
+        public async Task SendVerificationEmailAsync(string toEmail, string subject, int code)
         {
-            //var client = new SendGridClient(_sendGridApiKey);
-            //var from = new EmailAddress("test@example.com", "Example User");
-            //var subject = "Sending with SendGrid is Fun";
-            //var to = new EmailAddress("test@example.com", "Example User");
-            //var plainTextContent = "and easy to do anywhere, even with C#";
-            //var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-            //var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            //var response = await client.SendEmailAsync(msg);
+            var client = new SendGridClient(_sendGridApiKey);
+            var from = new EmailAddress("imegreladze.im@gmail.com", "Online Clinic");
+            var to = new EmailAddress(toEmail, "Registering user");
+            string emailBody = string.Format(emailBodyTemplate, code);
+
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, null, emailBody);
+
+            await client.SendEmailAsync(msg);
         }
 
         public int GenerateConfirmationCode()
@@ -48,7 +69,7 @@ namespace Online_Clinic.API.Services
             };
 
             _confirmationRepository.AddToDatabase(confirmation);
-            await SendEmailAsync(email, "Your Confirmation Code", $"Your code is {code}. It is valid for 2 minutes.");
+            await SendVerificationEmailAsync(email, "Email Confirmation Code", code);
         }
 
         public bool VerifyCode(string email, int code)

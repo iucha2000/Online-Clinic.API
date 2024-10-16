@@ -17,20 +17,20 @@ namespace Online_Clinic.API.Controllers
             _emailService = emailService;
         }
 
-        [HttpPost("Send-Email")]
-        public async Task<IActionResult> SendEmail([FromBody] EmailRequest emailRequest)
+        [HttpPost("Send-Confirmation-Code")]
+        public async Task<IActionResult> SendConfirmationCodeEmail(string email)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _emailService.SendConfirmationCodeAsync(emailRequest.Email);
+            await _emailService.SendConfirmationCodeAsync(email);
 
             return Ok(new { Message = "Email sent successfully" });
         }
 
-        [HttpPost("Verify-Code")]
+        [HttpPost("Verify-Confirmation-Code")]
         public IActionResult VerifyCode(string email, int code)
         {
             var result = _emailService.VerifyCode(email, code);

@@ -2,7 +2,7 @@
 {
     public interface IEmailService
     {
-        Task SendEmailAsync(string email, string subject, string message);
+        Task SendVerificationEmailAsync(string email, string subject, int code);
 
         int GenerateConfirmationCode();
 
