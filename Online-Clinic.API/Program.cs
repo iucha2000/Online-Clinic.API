@@ -7,6 +7,7 @@ using Online_Clinic.API.Middlewares;
 using Online_Clinic.API.Models;
 using Online_Clinic.API.Profiles;
 using Online_Clinic.API.Repositories.Oracle;
+using Online_Clinic.API.Services;
 using System.Text;
 
 namespace Online_Clinic.API
@@ -29,6 +30,8 @@ namespace Online_Clinic.API
             builder.Services.AddScoped<IDoctorRepository, PKG_DOCTORS>();
             builder.Services.AddScoped<IPatientRepository, PKG_PATIENTS>();
             builder.Services.AddScoped<IReservationRepository, PKG_RESERVATIONS>();
+            builder.Services.AddScoped<IEmailConfirmationRepository, PKG_EMAIL_CONFIRMATION>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
 
             builder.Services.AddCors(options =>
             {
