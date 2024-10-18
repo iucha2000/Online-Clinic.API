@@ -12,22 +12,23 @@ namespace Online_Clinic.API.Repositories.Oracle
 {
     public class PKG_DOCTORS : PKG_BASE, IDoctorRepository
     {
-        public PKG_DOCTORS(IConfiguration configuration) : base(configuration)
+        private readonly IAccountRepository _accountRepository;
+
+        public PKG_DOCTORS(IConfiguration configuration, IAccountRepository accountRepository) : base(configuration)
         {
+            _accountRepository = accountRepository;
         }
 
         public void AddEntity(Doctor entity)
         {
-            Doctor existingDoctor = GetByEmail(entity.Email, throwIfNotFound: false);
-            if (existingDoctor != null)
+            if (_accountRepository.EmailExists(entity.Email))
             {
-                throw new UserAlreadyExistsException("Doctor with given email already exists");
+                throw new UserAlreadyExistsException("User with given email already exists");
             }
 
-            existingDoctor = GetByPersonalId(entity.Personal_Id, throwIfNotFound: false);
-            if (existingDoctor != null)
+            if (_accountRepository.PersonalIdExists(entity.Personal_Id))
             {
-                throw new UserAlreadyExistsException("Doctor with given personalId already exists");
+                throw new UserAlreadyExistsException("User with given personalId already exists");
             }
 
             OracleConnection conn = new OracleConnection();
@@ -58,16 +59,14 @@ namespace Online_Clinic.API.Repositories.Oracle
         {
             Doctor existingDoctor = GetEntity(id);
 
-            existingDoctor = GetByEmail(entity.Email, throwIfNotFound: false);
-            if (existingDoctor != null)
+            if (_accountRepository.EmailExists(entity.Email))
             {
-                throw new UserAlreadyExistsException("Doctor with given email already exists");
+                throw new UserAlreadyExistsException("User with given email already exists");
             }
 
-            existingDoctor = GetByPersonalId(entity.Personal_Id, throwIfNotFound: false);
-            if (existingDoctor != null)
+            if (_accountRepository.PersonalIdExists(entity.Personal_Id))
             {
-                throw new UserAlreadyExistsException("Doctor with given personalId already exists");
+                throw new UserAlreadyExistsException("User with given personalId already exists");
             }
 
             OracleConnection conn = new OracleConnection();
@@ -200,93 +199,14 @@ namespace Online_Clinic.API.Repositories.Oracle
             return doctors;
         }
 
-        public Doctor GetByEmail(string email, bool throwIfNotFound = true)
+        public Doctor GetByEmail(string email)
         {
-            Doctor doctor = null;
-
-            OracleConnection conn = new OracleConnection();
-            conn.ConnectionString = ConnStr;
-
-            conn.Open();
-
-            OracleCommand cmd = conn.CreateCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_doctor_by_email";
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = email;
-            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-            OracleDataReader reader = cmd.ExecuteReader();
-            reader.Read();
-            if (reader.HasRows)
-            {
-                doctor = new Doctor()
-                {
-                    Id = int.Parse(reader["id"].ToString()),
-                    FirstName = reader["firstname"] != DBNull.Value ? reader["firstname"].ToString() : null,
-                    LastName = reader["lastname"] != DBNull.Value ? reader["lastname"].ToString() : null,
-                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
-                    Password = reader["password"] != DBNull.Value ? reader["password"].ToString() : null,
-                    Personal_Id = reader["personal_id"] != DBNull.Value ? reader["personal_id"].ToString() : null,
-                    Role = reader["role"] != DBNull.Value ? (Role?)Convert.ToInt32(reader["role"]) : null,
-                    Category = reader["category"] != DBNull.Value ? (Category?)Convert.ToInt32(reader["category"]) : null,
-                    Rating = reader["rating"] != DBNull.Value ? (int?)Convert.ToInt32(reader["rating"]) : null
-                };
-            }
-            else if (throwIfNotFound)
-            {
-                throw new UserNotFoundException($"Doctor with email:'{email}' does not exist");
-            }
-
-            conn.Close();
-
-            return doctor;
-
+            return _accountRepository.GetDoctorByEmail(email, true);
         }
 
-        public Doctor GetByPersonalId(string personalId, bool throwIfNotFound = true)
+        public Doctor GetByPersonalId(string personalId)
         {
-            Doctor doctor = null;
-
-            OracleConnection conn = new OracleConnection();
-            conn.ConnectionString = ConnStr;
-
-            conn.Open();
-
-            OracleCommand cmd = conn.CreateCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_doctor_by_personal_id";
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = personalId;
-            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-            OracleDataReader reader = cmd.ExecuteReader();
-            reader.Read();
-            if (reader.HasRows)
-            {
-                doctor = new Doctor()
-                {
-                    Id = int.Parse(reader["id"].ToString()),
-                    FirstName = reader["firstname"] != DBNull.Value ? reader["firstname"].ToString() : null,
-                    LastName = reader["lastname"] != DBNull.Value ? reader["lastname"].ToString() : null,
-                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
-                    Password = reader["password"] != DBNull.Value ? reader["password"].ToString() : null,
-                    Personal_Id = reader["personal_id"] != DBNull.Value ? reader["personal_id"].ToString() : null,
-                    Role = reader["role"] != DBNull.Value ? (Role?)Convert.ToInt32(reader["role"]) : null,
-                    Category = reader["category"] != DBNull.Value ? (Category?)Convert.ToInt32(reader["category"]) : null,
-                    Rating = reader["rating"] != DBNull.Value ? (int?)Convert.ToInt32(reader["rating"]) : null
-                };
-            }
-            else if (throwIfNotFound)
-            {
-                throw new UserNotFoundException($"Doctor with personalId:'{personalId}' does not exist");
-            }
-
-            conn.Close();
-
-            return doctor;
+            return _accountRepository.GetDoctorByPersonalId(personalId, true);
         }
 
         public void UploadImage(int doctorId, IFormFile image)

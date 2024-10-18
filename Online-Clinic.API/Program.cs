@@ -27,6 +27,7 @@ namespace Online_Clinic.API
 
             //Change the class objects when switching to different repository
             builder.Services.AddScoped<IJwtManager, JwtManager>();
+            builder.Services.AddScoped<IAccountRepository, PKG_ACCOUNTS>();
             builder.Services.AddScoped<IDoctorRepository, PKG_DOCTORS>();
             builder.Services.AddScoped<IPatientRepository, PKG_PATIENTS>();
             builder.Services.AddScoped<IReservationRepository, PKG_RESERVATIONS>();

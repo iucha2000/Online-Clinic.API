@@ -11,29 +11,22 @@ namespace Online_Clinic.API.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IJwtManager _jwtManager;
-        private readonly IPatientRepository _patientRepository;
+        private readonly IAccountRepository _accountRepository;
 
-        public AuthenticationController(IJwtManager jwtManager, IPatientRepository patientRepository)
+        public AuthenticationController(IJwtManager jwtManager, IAccountRepository accountRepository)
         {
             _jwtManager = jwtManager;
-            _patientRepository = patientRepository;
+            _accountRepository = accountRepository;
         }
 
-        //TODO make authentication for every user type
+        //TODO think about storing info in token - user or doctor for easier fetch
 
-        [HttpPost]
+        [HttpPost("Login")]
         public IActionResult Authenticate(Login user)
         {
-            Patient existingUser = _patientRepository.GetByEmail(user.Email, throwIfNotFound: false);
-            if (existingUser == null)
-            {
-                throw new InvalidCredentialsException("Invalid credentials");
-            }
-            if(existingUser.Password != user.Password)
-            {
-                throw new InvalidCredentialsException("Invalid credentials");
-            }
+            Account existingUser = _accountRepository.ValidateUser(user.Email, user.Password);
             var token = _jwtManager.GetToken(existingUser);
+
             return Ok(token);
         }
     }

@@ -4,9 +4,9 @@ namespace Online_Clinic.API.Interfaces
 {
     public interface IDoctorRepository : IRepository<Doctor>
     {
-        Doctor GetByEmail(string email, bool throwIfNotFound = true);
+        Doctor GetByEmail(string email);
 
-        Doctor GetByPersonalId(string personalId, bool throwIfNotFound = true);
+        Doctor GetByPersonalId(string personalId);
 
         void UploadImage(int doctorId, IFormFile image);
 

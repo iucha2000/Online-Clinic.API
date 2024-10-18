@@ -9,20 +9,21 @@ namespace Online_Clinic.API.Repositories.Oracle
 {
     public class PKG_PATIENTS : PKG_BASE, IPatientRepository
     {
-        public PKG_PATIENTS(IConfiguration configuration) : base(configuration)
+        private readonly IAccountRepository _accountRepository;
+
+        public PKG_PATIENTS(IConfiguration configuration, IAccountRepository accountRepository) : base(configuration)
         {
+            _accountRepository = accountRepository;
         }
 
         public void AddEntity(Patient entity)
         {
-            Patient existingPatient = GetByEmail(entity.Email, throwIfNotFound: false);
-            if(existingPatient != null)
+            if (_accountRepository.EmailExists(entity.Email))
             {
                 throw new UserAlreadyExistsException("User with given email already exists");
             }
 
-            existingPatient = GetByPersonalId(entity.Personal_Id, throwIfNotFound: false);
-            if(existingPatient != null)
+            if (_accountRepository.PersonalIdExists(entity.Personal_Id))
             {
                 throw new UserAlreadyExistsException("User with given personalId already exists");
             }
@@ -51,16 +52,12 @@ namespace Online_Clinic.API.Repositories.Oracle
 
         public void UpdateEntity(int id, Patient entity)
         {
-            Patient existingPatient = GetEntity(id);
-
-            existingPatient = GetByEmail(entity.Email, throwIfNotFound: false);
-            if (existingPatient != null)
+            if (_accountRepository.EmailExists(entity.Email))
             {
                 throw new UserAlreadyExistsException("User with given email already exists");
             }
 
-            existingPatient = GetByPersonalId(entity.Personal_Id, throwIfNotFound: false);
-            if (existingPatient != null)
+            if (_accountRepository.PersonalIdExists(entity.Personal_Id))
             {
                 throw new UserAlreadyExistsException("User with given personalId already exists");
             }
@@ -188,88 +185,14 @@ namespace Online_Clinic.API.Repositories.Oracle
             return patients;
         }
 
-        public Patient GetByEmail(string email, bool throwIfNotFound = true)
+        public Patient GetByEmail(string email)
         {
-            Patient patient = null;
-
-            OracleConnection conn = new OracleConnection();
-            conn.ConnectionString = ConnStr;
-
-            conn.Open();
-
-            OracleCommand cmd = conn.CreateCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "olerning.PKG_IURI_PATIENTS.get_patient_by_email";
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = email;
-            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-            OracleDataReader reader = cmd.ExecuteReader();
-            reader.Read();
-            if (reader.HasRows)
-            {
-                patient = new Patient()
-                {
-                    Id = int.Parse(reader["id"].ToString()),
-                    FirstName = reader["firstname"] != DBNull.Value ? reader["firstname"].ToString() : null,
-                    LastName = reader["lastname"] != DBNull.Value ? reader["lastname"].ToString() : null,
-                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
-                    Password = reader["password"] != DBNull.Value ? reader["password"].ToString() : null,
-                    Personal_Id = reader["personal_id"] != DBNull.Value ? reader["personal_id"].ToString() : null,
-                    Role = reader["role"] != DBNull.Value ? (Role?)Convert.ToInt32(reader["role"]) : null
-                };
-            }
-            else if (throwIfNotFound)
-            {
-                throw new UserNotFoundException($"User with email:'{email}' does not exist");
-            }
-
-            conn.Close();
-
-            return patient;
+            return _accountRepository.GetPatientByEmail(email, true);
         }
 
-        public Patient GetByPersonalId(string personalId, bool throwIfNotFound = true)
+        public Patient GetByPersonalId(string personalId)
         {
-            Patient patient = null;
-
-            OracleConnection conn = new OracleConnection();
-            conn.ConnectionString = ConnStr;
-
-            conn.Open();
-
-            OracleCommand cmd = conn.CreateCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "olerning.PKG_IURI_PATIENTS.get_patient_by_personal_id";
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = personalId;
-            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-            OracleDataReader reader = cmd.ExecuteReader();
-            reader.Read();
-            if (reader.HasRows)
-            {
-                patient = new Patient()
-                {
-                    Id = int.Parse(reader["id"].ToString()),
-                    FirstName = reader["firstname"] != DBNull.Value ? reader["firstname"].ToString() : null,
-                    LastName = reader["lastname"] != DBNull.Value ? reader["lastname"].ToString() : null,
-                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
-                    Password = reader["password"] != DBNull.Value ? reader["password"].ToString() : null,
-                    Personal_Id = reader["personal_id"] != DBNull.Value ? reader["personal_id"].ToString() : null,
-                    Role = reader["role"] != DBNull.Value ? (Role?)Convert.ToInt32(reader["role"]) : null
-                };
-            }
-            else if (throwIfNotFound)
-            {
-                throw new UserNotFoundException($"User with personalId:'{personalId}' does not exist");
-            }
-
-            conn.Close();
-
-            return patient;
+            return _accountRepository.GetPatientByPersonalId(personalId, true);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Online_Clinic.API.Models
 {
-    public abstract class Account
+    public class Account
     {
         public int Id { get; set; }
         public string? FirstName { get; set; }
