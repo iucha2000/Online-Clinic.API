@@ -37,8 +37,8 @@ namespace Online_Clinic.API.Repositories.Oracle
 
             cmd.Parameters.Add("v_patientid", OracleDbType.Int32).Value = patient.Id;
             cmd.Parameters.Add("v_doctorid", OracleDbType.Int32).Value = doctor.Id;
-            cmd.Parameters.Add("v_description", OracleDbType.Varchar2).Value = entity.Description;
-            cmd.Parameters.Add("v_reservation_date", OracleDbType.Date).Value = entity.ReservationDate;
+            cmd.Parameters.Add("v_description", OracleDbType.Varchar2).Value = entity.Description ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_reservation_date", OracleDbType.Date).Value = entity.ReservationDate ?? (object)DBNull.Value;
 
             cmd.ExecuteNonQuery();
 
@@ -64,8 +64,8 @@ namespace Online_Clinic.API.Repositories.Oracle
             cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = id;
             cmd.Parameters.Add("v_patientid", OracleDbType.Int32).Value = patient.Id;
             cmd.Parameters.Add("v_doctorid", OracleDbType.Int32).Value = doctor.Id;
-            cmd.Parameters.Add("v_description", OracleDbType.Varchar2).Value = entity.Description;
-            cmd.Parameters.Add("v_reservation_date", OracleDbType.Date).Value = entity.ReservationDate;
+            cmd.Parameters.Add("v_description", OracleDbType.Varchar2).Value = entity.Description ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_reservation_date", OracleDbType.Date).Value = entity.ReservationDate ?? (object)DBNull.Value;
 
             cmd.ExecuteNonQuery();
 
@@ -120,8 +120,8 @@ namespace Online_Clinic.API.Repositories.Oracle
                     Id = id,
                     PatientId = int.Parse(reader["patientid"].ToString()),
                     DoctorId = int.Parse(reader["doctorid"].ToString()),
-                    Description = reader["description"].ToString(),
-                    ReservationDate = Convert.ToDateTime(reader["reservation_date"]),
+                    Description = reader["description"] != DBNull.Value ? reader["description"].ToString() : null,
+                    ReservationDate = reader["reservation_date"] != DBNull.Value ? Convert.ToDateTime(reader["reservation_date"]) : null
                 };
             }
             else if (throwIfNotFound)
@@ -158,8 +158,8 @@ namespace Online_Clinic.API.Repositories.Oracle
                     Id = int.Parse(reader["id"].ToString()),
                     PatientId = int.Parse(reader["patientid"].ToString()),
                     DoctorId = int.Parse(reader["doctorid"].ToString()),
-                    Description = reader["description"].ToString(),
-                    ReservationDate = Convert.ToDateTime(reader["reservation_date"]),
+                    Description = reader["description"] != DBNull.Value ? reader["description"].ToString() : null,
+                    ReservationDate = reader["reservation_date"] != DBNull.Value ? Convert.ToDateTime(reader["reservation_date"]) : null
                 };
 
                 reservations.Add(reservation);
@@ -196,8 +196,8 @@ namespace Online_Clinic.API.Repositories.Oracle
                     Id = int.Parse(reader["id"].ToString()),
                     PatientId = int.Parse(reader["patientid"].ToString()),
                     DoctorId = int.Parse(reader["doctorid"].ToString()),
-                    Description = reader["description"].ToString(),
-                    ReservationDate = Convert.ToDateTime(reader["reservation_date"]),
+                    Description = reader["description"] != DBNull.Value ? reader["description"].ToString() : null,
+                    ReservationDate = reader["reservation_date"] != DBNull.Value ? Convert.ToDateTime(reader["reservation_date"]) : null
                 };
 
                 reservations.Add(reservation);
@@ -234,8 +234,8 @@ namespace Online_Clinic.API.Repositories.Oracle
                     Id = int.Parse(reader["id"].ToString()),
                     PatientId = int.Parse(reader["patientid"].ToString()),
                     DoctorId = int.Parse(reader["doctorid"].ToString()),
-                    Description = reader["description"].ToString(),
-                    ReservationDate = Convert.ToDateTime(reader["reservation_date"]),
+                    Description = reader["description"] != DBNull.Value ? reader["description"].ToString() : null,
+                    ReservationDate = reader["reservation_date"] != DBNull.Value ? Convert.ToDateTime(reader["reservation_date"]) : null
                 };
 
                 reservations.Add(reservation);

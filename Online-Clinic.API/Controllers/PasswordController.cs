@@ -31,7 +31,7 @@ namespace Online_Clinic.API.Controllers
         }
 
         [HttpPost("Verify-Confirmation-Code")]
-        public IActionResult VerifyCode(string email, int code)
+        public IActionResult VerifyConfrmationCode(string email, int code)
         {
             var result = _emailService.VerifyCode(email, code);
 

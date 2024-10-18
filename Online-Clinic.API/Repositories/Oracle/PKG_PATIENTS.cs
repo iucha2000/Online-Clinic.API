@@ -37,13 +37,12 @@ namespace Online_Clinic.API.Repositories.Oracle
             cmd.CommandText = "olerning.PKG_IURI_PATIENTS.add_patient";
             cmd.CommandType = CommandType.StoredProcedure;
 
-            cmd.Parameters.Add("v_firstname", OracleDbType.Varchar2).Value = entity.FirstName;
-            cmd.Parameters.Add("v_lastname", OracleDbType.Varchar2).Value = entity.LastName;
-            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = entity.Email;
-            cmd.Parameters.Add("v_password", OracleDbType.Varchar2).Value = entity.Password;
-            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = entity.Personal_Id;
-            cmd.Parameters.Add("v_activationcode", OracleDbType.Int32).Value = entity.ActivationCode;
-            cmd.Parameters.Add("v_role", OracleDbType.Int32).Value = entity.Role;
+            cmd.Parameters.Add("v_firstname", OracleDbType.Varchar2).Value = entity.FirstName ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_lastname", OracleDbType.Varchar2).Value = entity.LastName ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = entity.Email ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_password", OracleDbType.Varchar2).Value = entity.Password ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = entity.Personal_Id ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_role", OracleDbType.Int32).Value = entity.Role.HasValue ? (int)entity.Role.Value : (object)DBNull.Value;
 
             cmd.ExecuteNonQuery();
 
@@ -77,13 +76,12 @@ namespace Online_Clinic.API.Repositories.Oracle
             cmd.CommandType = CommandType.StoredProcedure;
 
             cmd.Parameters.Add("v_id", OracleDbType.Int32).Value = id;
-            cmd.Parameters.Add("v_firstname", OracleDbType.Varchar2).Value = entity.FirstName;
-            cmd.Parameters.Add("v_lastname", OracleDbType.Varchar2).Value = entity.LastName;
-            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = entity.Email;
-            cmd.Parameters.Add("v_password", OracleDbType.Varchar2).Value = entity.Password;
-            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = entity.Personal_Id;
-            cmd.Parameters.Add("v_activationcode", OracleDbType.Int32).Value = entity.ActivationCode;
-            cmd.Parameters.Add("v_role", OracleDbType.Int32).Value = entity.Role;
+            cmd.Parameters.Add("v_firstname", OracleDbType.Varchar2).Value = entity.FirstName ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_lastname", OracleDbType.Varchar2).Value = entity.LastName ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = entity.Email ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_password", OracleDbType.Varchar2).Value = entity.Password ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = entity.Personal_Id ?? (object)DBNull.Value;
+            cmd.Parameters.Add("v_role", OracleDbType.Int32).Value = entity.Role.HasValue ? (int)entity.Role.Value : (object)DBNull.Value;
 
             cmd.ExecuteNonQuery();
 
@@ -135,13 +133,12 @@ namespace Online_Clinic.API.Repositories.Oracle
                 patient = new Patient()
                 {
                     Id = id,
-                    FirstName = reader["firstname"].ToString(),
-                    LastName = reader["lastname"].ToString(),
-                    Email = reader["email"].ToString(),
-                    Password = reader["password"].ToString(),
-                    Personal_Id = reader["personal_id"].ToString(),
-                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
-                    Role = (Role)int.Parse(reader["role"].ToString())
+                    FirstName = reader["firstname"] != DBNull.Value ? reader["firstname"].ToString() : null,
+                    LastName = reader["lastname"] != DBNull.Value ? reader["lastname"].ToString() : null,
+                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
+                    Password = reader["password"] != DBNull.Value ? reader["password"].ToString() : null,
+                    Personal_Id = reader["personal_id"] != DBNull.Value ? reader["personal_id"].ToString() : null,
+                    Role = reader["role"] != DBNull.Value ? (Role?)Convert.ToInt32(reader["role"]) : null
                 };
             }
             else if(throwIfNotFound)
@@ -176,13 +173,12 @@ namespace Online_Clinic.API.Repositories.Oracle
                 Patient patient = new Patient()
                 {
                     Id = int.Parse(reader["id"].ToString()),
-                    FirstName = reader["firstname"].ToString(),
-                    LastName = reader["lastname"].ToString(),
-                    Email = reader["email"].ToString(),
-                    Password = reader["password"].ToString(),
-                    Personal_Id = reader["personal_id"].ToString(),
-                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
-                    Role = (Role)int.Parse(reader["role"].ToString())
+                    FirstName = reader["firstname"] != DBNull.Value ? reader["firstname"].ToString() : null,
+                    LastName = reader["lastname"] != DBNull.Value ? reader["lastname"].ToString() : null,
+                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
+                    Password = reader["password"] != DBNull.Value ? reader["password"].ToString() : null,
+                    Personal_Id = reader["personal_id"] != DBNull.Value ? reader["personal_id"].ToString() : null,
+                    Role = reader["role"] != DBNull.Value ? (Role?)Convert.ToInt32(reader["role"]) : null
                 };
 
                 patients.Add(patient);
@@ -216,13 +212,12 @@ namespace Online_Clinic.API.Repositories.Oracle
                 patient = new Patient()
                 {
                     Id = int.Parse(reader["id"].ToString()),
-                    FirstName = reader["firstname"].ToString(),
-                    LastName = reader["lastname"].ToString(),
-                    Email = reader["email"].ToString(),
-                    Password = reader["password"].ToString(),
-                    Personal_Id = reader["personal_id"].ToString(),
-                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
-                    Role = (Role)int.Parse(reader["role"].ToString())
+                    FirstName = reader["firstname"] != DBNull.Value ? reader["firstname"].ToString() : null,
+                    LastName = reader["lastname"] != DBNull.Value ? reader["lastname"].ToString() : null,
+                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
+                    Password = reader["password"] != DBNull.Value ? reader["password"].ToString() : null,
+                    Personal_Id = reader["personal_id"] != DBNull.Value ? reader["personal_id"].ToString() : null,
+                    Role = reader["role"] != DBNull.Value ? (Role?)Convert.ToInt32(reader["role"]) : null
                 };
             }
             else if (throwIfNotFound)
@@ -259,13 +254,12 @@ namespace Online_Clinic.API.Repositories.Oracle
                 patient = new Patient()
                 {
                     Id = int.Parse(reader["id"].ToString()),
-                    FirstName = reader["firstname"].ToString(),
-                    LastName = reader["lastname"].ToString(),
-                    Email = reader["email"].ToString(),
-                    Password = reader["password"].ToString(),
-                    Personal_Id = reader["personal_id"].ToString(),
-                    ActivationCode = int.Parse(reader["activationcode"].ToString()),
-                    Role = (Role)int.Parse(reader["role"].ToString())
+                    FirstName = reader["firstname"] != DBNull.Value ? reader["firstname"].ToString() : null,
+                    LastName = reader["lastname"] != DBNull.Value ? reader["lastname"].ToString() : null,
+                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
+                    Password = reader["password"] != DBNull.Value ? reader["password"].ToString() : null,
+                    Personal_Id = reader["personal_id"] != DBNull.Value ? reader["personal_id"].ToString() : null,
+                    Role = reader["role"] != DBNull.Value ? (Role?)Convert.ToInt32(reader["role"]) : null
                 };
             }
             else if (throwIfNotFound)

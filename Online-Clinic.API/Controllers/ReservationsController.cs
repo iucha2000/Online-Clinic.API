@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Online_Clinic.API.DTOs;
@@ -20,6 +21,7 @@ namespace Online_Clinic.API.Controllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpPost("Add-Reservation")]
         public IActionResult AddReservation(ReservationDto reservationDto)
         {
@@ -28,6 +30,7 @@ namespace Online_Clinic.API.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpPut("Update-Reservation/{id}")]
         public IActionResult UpdateReservation(int id, ReservationDto reservationDto)
         {
@@ -36,6 +39,7 @@ namespace Online_Clinic.API.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpDelete("Delete-Reservation/{id}")]
         public IActionResult DeleteReservation(int id)
         {

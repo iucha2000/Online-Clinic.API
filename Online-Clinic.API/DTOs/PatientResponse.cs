@@ -11,9 +11,6 @@ namespace Online_Clinic.API.DTOs
         public string Email { get; set; }
         public string Password { get; set; }
         public string Personal_Id { get; set; }
-        public int ActivationCode { get; set; }
         public Role Role { get; set; }
-        public Reservation[]? Reservations { get; set; }
-
     }
 }
