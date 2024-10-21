@@ -24,7 +24,7 @@ namespace Online_Clinic.API.DTOs
         [Length(10, 11)]
         public string? Personal_Id { get; set; }
 
-        [ValidEnumValue(typeof(Role))]
+        [ValidEnumValue(typeof(Role), Enums.Role.Admin, Enums.Role.Doctor)]
         public Role? Role { get; set; }
 
         [ValidEnumValue(typeof(Category))]
