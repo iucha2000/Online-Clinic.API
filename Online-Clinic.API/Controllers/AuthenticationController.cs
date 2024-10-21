@@ -19,8 +19,6 @@ namespace Online_Clinic.API.Controllers
             _accountRepository = accountRepository;
         }
 
-        //TODO think about storing info in token - user or doctor for easier fetch
-
         [HttpPost("Login")]
         public IActionResult Authenticate(Login user)
         {
