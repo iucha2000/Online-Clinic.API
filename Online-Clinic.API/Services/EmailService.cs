@@ -4,12 +4,14 @@ using SendGrid;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Online_Clinic.API.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Online_Clinic.API.Exceptions;
 
 namespace Online_Clinic.API.Services
 {
     public class EmailService : IEmailService
     {
         private readonly IEmailConfirmationRepository _confirmationRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly string _sendGridApiKey;
         string emailBodyTemplate = @"
         <!DOCTYPE html>
@@ -26,16 +28,17 @@ namespace Online_Clinic.API.Services
         </head>
         <body>
             <div class=""container"">
-                <div class=""header""><h1>Confirmation Code</h1></div>
-                <p>Your code is <span class=""code"">{0}</span>.</p>
-                <p>It is valid for 2 minutes.</p>
+                <div class=""header""><h1>{0}</h1></div>
+                <p>Your code is <span class=""code"">{1}</span>.</p>
+                <p>{2}</p>
             </div>
         </body>
         </html>";
 
-        public EmailService(IEmailConfirmationRepository confirmationRepository, IConfiguration configuration)
+        public EmailService(IEmailConfirmationRepository confirmationRepository, IAccountRepository accountRepository, IConfiguration configuration)
         {
             _confirmationRepository = confirmationRepository;
+            _accountRepository = accountRepository;
             _sendGridApiKey = configuration["SendGridApiKey"];
         }
 
@@ -44,7 +47,7 @@ namespace Online_Clinic.API.Services
             var client = new SendGridClient(_sendGridApiKey);
             var from = new EmailAddress("imegreladze.im@gmail.com", "Online Clinic");
             var to = new EmailAddress(toEmail, "Registering user");
-            string emailBody = string.Format(emailBodyTemplate, code);
+            string emailBody = string.Format(emailBodyTemplate, "Confirmation code", code, "It is valid for 2 minutes.");
 
             var msg = MailHelper.CreateSingleEmail(from, to, subject, null, emailBody);
 
@@ -59,6 +62,11 @@ namespace Online_Clinic.API.Services
 
         public async Task SendConfirmationCodeAsync(string email)
         {
+            if (!_accountRepository.EmailExists(email))
+            {
+                throw new UserNotFoundException($"User with email:'{email}' does not exist");
+            }
+
             int code = GenerateConfirmationCode();
 
             var confirmation = new EmailConfirmation
@@ -82,6 +90,39 @@ namespace Online_Clinic.API.Services
             }
 
             return confirmation.Code == code;
+        }
+
+        public async Task SendPasswordResetEmailAsync(string toEmail, string subject, string newPassword)
+        {
+            var client = new SendGridClient(_sendGridApiKey);
+            var from = new EmailAddress("imegreladze.im@gmail.com", "Online Clinic");
+            var to = new EmailAddress(toEmail, "Registering user");
+            string emailBody = string.Format(emailBodyTemplate, "Your new password", newPassword, "Log in with your new password");
+
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, null, emailBody);
+
+            await client.SendEmailAsync(msg);
+        }
+
+        public string GenerateNewPassword()
+        {
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(validChars, 8).Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public async Task SendNewPasswordAsync(string email)
+        {
+            if (!_accountRepository.EmailExists(email))
+            {
+                throw new UserNotFoundException($"User with email:'{email}' does not exist");
+            }
+
+            string newPassword = GenerateNewPassword();
+
+            _accountRepository.UpdateUserPassword(email, newPassword);
+
+            await SendPasswordResetEmailAsync(email, "Reset Password", newPassword);
         }
     }
 }

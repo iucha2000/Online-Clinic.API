@@ -246,5 +246,25 @@ namespace Online_Clinic.API.Repositories.Oracle
 
             return doctor;
         }
+
+        public void UpdateUserPassword(string email, string password)
+        {
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_PATIENTS.update_user_password";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_email", OracleDbType.Varchar2).Value = email;
+            cmd.Parameters.Add("v_password", OracleDbType.Varchar2).Value = password;
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
+        }
     }
 }

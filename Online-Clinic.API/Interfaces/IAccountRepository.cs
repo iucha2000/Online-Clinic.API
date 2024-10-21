@@ -19,5 +19,7 @@ namespace Online_Clinic.API.Interfaces
         Patient GetPatientByPersonalId(string personalId, bool throwIfNotFound = true);
 
         Doctor GetDoctorByPersonalId(string personalId, bool throwIfNotFound = true);
+
+        void UpdateUserPassword(string email, string password);
     }
 }
