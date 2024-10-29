@@ -62,10 +62,10 @@ namespace Online_Clinic.API.Services
 
         public async Task SendConfirmationCodeAsync(string email)
         {
-            if (!_accountRepository.EmailExists(email))
-            {
-                throw new UserNotFoundException($"User with email:'{email}' does not exist");
-            }
+            //if (!_accountRepository.EmailExists(email))
+            //{
+            //    throw new UserNotFoundException($"User with email:'{email}' does not exist");
+            //}
 
             int code = GenerateConfirmationCode();
 
