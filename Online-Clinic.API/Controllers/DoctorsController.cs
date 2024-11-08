@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Online_Clinic.API.DTOs;
+using Online_Clinic.API.Enums;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
 using System.Numerics;
@@ -94,6 +95,13 @@ namespace Online_Clinic.API.Controllers
             var fileName = $"Doctor_{doctorId}_CV.pdf";
 
             return File(cvData, fileType, fileName);
+        }
+
+        [HttpGet("Get-Category-List")]
+        public IActionResult GetCategoryList()
+        {
+            List<CategoryInfo> categoryInfos = _doctorRepository.GetCategoryList();
+            return Ok(categoryInfos);
         }
     }
 }

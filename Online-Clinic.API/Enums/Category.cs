@@ -2,25 +2,32 @@
 {
     public enum Category
     {
-        Cardiologist,       // Heart specialist
-        Traumatologist,     // Injury specialist
-        Neurologist,        // Nervous system specialist
-        Dermatologist,      // Skin specialist
-        Ophthalmologist,    // Eye specialist
-        Gastroenterologist, // Digestive system specialist
-        Endocrinologist,    // Hormone and glands specialist
-        Orthopedist,        // Bone and muscle specialist
-        Pediatrician,       // Child health specialist
-        Psychiatrist,       // Mental health specialist
-        Oncologist,         // Cancer specialist
-        Pulmonologist,      // Lung specialist
-        Rheumatologist,     // Joint and autoimmune disease specialist
-        Nephrologist,       // Kidney specialist
-        Urologist,          // Urinary system and male reproductive specialist
-        Gynecologist,       // Female reproductive system specialist
-        Otolaryngologist,   // Ear, nose, and throat specialist
-        Allergist,          // Allergy and immune system specialist
-        Anesthesiologist,   // Pain and sedation specialist
-        Hematologist        // Blood specialist
+        კარდიოლოგი = 0,
+        ტრავმატოლოგი = 1,
+        ნევროლოგი = 2,
+        დერმატოლოგი = 3,
+        ოფთალმოლოგი = 4,
+        გასტეროენტეროლოგი = 5,
+        ენდოკრინოლოგი = 6,
+        ორთოპედისტი = 7,
+        პედიატრი = 8,
+        ფსიქიატრი = 9,
+        ონკოლოგი = 10,
+        პულმონოლოგი = 11,
+        რევმატოლოგი = 12,
+        ნეფროლოგი = 13,
+        უროლოგი = 14,
+        გინეკოლოგი = 15,
+        ოტორინოლარინგოლოგი = 16,
+        ალერგოლოგი = 17,
+        ანესთეზიოლოგი = 18,
+        ჰემატოლოგი = 19,
+        პათოლოგი = 20,
+        იმუნოლოგი = 21,
+        რადიოლოგი = 22,
+        გერიატრი = 23,
+        ქირურგი = 24,
+        სტომატოლოგი = 25,
+        ფარმაკოლოგი = 26
     }
 }

@@ -7,6 +7,8 @@ using System.Data;
 using static System.Net.Mime.MediaTypeNames;
 using System.Linq;
 using Oracle.ManagedDataAccess.Types;
+using System.Numerics;
+using System.Reflection.PortableExecutable;
 
 namespace Online_Clinic.API.Repositories.Oracle
 {
@@ -363,6 +365,39 @@ namespace Online_Clinic.API.Repositories.Oracle
             }
 
             return cvData;
+        }
+
+        public List<CategoryInfo> GetCategoryList()
+        {
+            List<CategoryInfo> categoryInfos = new List<CategoryInfo>();
+
+            OracleConnection conn = new OracleConnection();
+            conn.ConnectionString = ConnStr;
+
+            conn.Open();
+
+            OracleCommand cmd = conn.CreateCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "olerning.PKG_IURI_DOCTORS.get_categories_count";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("v_result", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            OracleDataReader reader = cmd.ExecuteReader();
+
+            foreach (int Id in Enum.GetValues(typeof(Category)))
+            {
+                categoryInfos.Add(new CategoryInfo() { Id = Id, Name = Enum.GetName(typeof(Category), Id), Count = 0 });
+            }
+
+            while (reader.Read())
+            {
+                categoryInfos.Find(x => x.Id == int.Parse(reader["category"].ToString())).Count = int.Parse(reader["category_count"].ToString());
+            }
+
+            conn.Close();
+
+            return categoryInfos;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Online_Clinic.API.Models;
+﻿using Online_Clinic.API.Enums;
+using Online_Clinic.API.Models;
 
 namespace Online_Clinic.API.Interfaces
 {
@@ -15,5 +16,7 @@ namespace Online_Clinic.API.Interfaces
         void UploadCV(int doctorId, IFormFile cv);
 
         byte[] GetCV(int doctorId);
+
+        List<CategoryInfo> GetCategoryList();
     }
 }
