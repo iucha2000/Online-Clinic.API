@@ -54,6 +54,7 @@ namespace Online_Clinic.API.Controllers
         }
 
         [HttpGet("Get-All-Doctors")]
+        [ResponseCache(Duration = 60)]
         public IActionResult GetAllDoctors()
         {
             List<Doctor> doctors = _doctorRepository.GetEntities();
@@ -69,6 +70,7 @@ namespace Online_Clinic.API.Controllers
         }
 
         [HttpGet("Get-Image/{doctorId}")]
+        [ResponseCache(Duration = 60)]
         public IActionResult GetImage(int doctorId)
         {
             byte[] photoData = _doctorRepository.GetImage(doctorId);
@@ -98,6 +100,7 @@ namespace Online_Clinic.API.Controllers
         }
 
         [HttpGet("Get-Category-List")]
+        [ResponseCache(Duration = 60)]
         public IActionResult GetCategoryList()
         {
             List<CategoryInfo> categoryInfos = _doctorRepository.GetCategoryList();

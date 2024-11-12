@@ -90,6 +90,8 @@ namespace Online_Clinic.API
                 };
             });
 
+            builder.Services.AddResponseCaching();
+
             var app = builder.Build();
 
             app.UseMiddleware<ExceptionMiddleware>();
