@@ -33,6 +33,7 @@ namespace Online_Clinic.API
             builder.Services.AddScoped<IReservationRepository, PKG_RESERVATIONS>();
             builder.Services.AddScoped<IEmailConfirmationRepository, PKG_EMAIL_CONFIRMATION>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<ICVService, CVService>();
 
             builder.Services.AddCors(options =>
             {

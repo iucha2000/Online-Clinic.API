@@ -298,11 +298,11 @@ namespace Online_Clinic.API.Repositories.Oracle
                 throw new FileUploadException("Please upload a valid file");
             }
 
-            var allowedExtensions = new[] {".txt", ".doc", ".docx", ".pdf"};
+            var allowedExtensions = new[] {".pdf"};
             var fileExtension = Path.GetExtension(cv.FileName).ToLowerInvariant();
             if (!allowedExtensions.Contains(fileExtension))
             {
-                throw new FileUploadException("Invalid file type. Allowed types are: .txt, .doc, .docx, .pdf");
+                throw new FileUploadException("Invalid file type. Allowed types are: .pdf");
             }
 
             byte[] cvData;

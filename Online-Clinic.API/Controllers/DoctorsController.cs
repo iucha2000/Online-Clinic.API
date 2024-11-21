@@ -15,11 +15,13 @@ namespace Online_Clinic.API.Controllers
     {
         private readonly IDoctorRepository _doctorRepository;
         private readonly IMapper _mapper;
+        private readonly ICVService _cvService;
 
-        public DoctorsController(IDoctorRepository doctorRepository, IMapper mapper)
+        public DoctorsController(IDoctorRepository doctorRepository, IMapper mapper, ICVService cvService)
         {
             _doctorRepository = doctorRepository;
             _mapper = mapper;
+            _cvService = cvService;
         }
 
         [HttpPost("Add-Doctor")]
@@ -46,6 +48,7 @@ namespace Online_Clinic.API.Controllers
         }
 
         [HttpGet("Get-Doctor-By-Id/{id}")]
+        [ResponseCache(Duration = 60)]
         public IActionResult GetDoctor(int id)
         {
             Doctor doctor = _doctorRepository.GetEntity(id);
@@ -97,6 +100,16 @@ namespace Online_Clinic.API.Controllers
             var fileName = $"Doctor_{doctorId}_CV.pdf";
 
             return File(cvData, fileType, fileName);
+        }
+
+        [HttpGet("Parse-CV/{doctorId}")]
+        [ResponseCache(Duration = 60)]
+        public IActionResult ParseCV(int doctorId)
+        {
+            byte[] cvData = _doctorRepository.GetCV(doctorId);
+
+            var parsedExperiences = _cvService.ParseExperienceFromPdf(cvData);
+            return Ok(parsedExperiences);
         }
 
         [HttpGet("Get-Category-List")]
