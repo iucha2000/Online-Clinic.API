@@ -10,16 +10,16 @@ namespace Online_Clinic.API.Services
 
         public Dictionary<string, string> ParseExperienceFromPdf(byte[] cvAsBytes)
         {
+            //TODO fix pattern matching for every scenario (and uncomment cache for experience parsing request)
             var experiences = new Dictionary<string, string>();
 
             IFormFile cv = ConvertByteArrayToFormFile(cvAsBytes);
 
             string extractedText = ExtractTextFromPdf(cv);
-            extractedText = extractedText.Replace("\r\n", "\n").Replace("\r", "\n").Replace("–", "-").Trim();
-
+            //extractedText = extractedText.Replace("\r\n", "\n").Replace("\r", "\n").Replace("–", "-").Trim
             var experienceSection = ExtractExperienceSection(extractedText);
 
-            var regex = new Regex(@"(\d{4}\s*[-,]\s*(Present|დღემდე))\s*[-,\s]*\s*([^-\d]+(?:,\s*[^-\d]+)*)");
+            var regex = new Regex(@"(\d{4}-\d{4}|\d{4}\s*[-,]\s*(Present|დღემდე)?)\s*[-,\s]*\s*([^-\d]+(?:,\s*[^-\d]+)*)");
             var matches = regex.Matches(experienceSection);
 
             foreach (Match match in matches)
@@ -64,12 +64,13 @@ namespace Online_Clinic.API.Services
             foreach (var keyword in keywords)
             {
                 int startIndex = text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase);
+
                 if (startIndex > -1)
                 {
-                    return text.Substring(startIndex);
+                    int startAfterKeyword = startIndex + keyword.Length;
+                    return text.Substring(startAfterKeyword).Trim();
                 }
             }
-
             return string.Empty;
         }
     }
