@@ -1,4 +1,5 @@
 ﻿using Online_Clinic.API.Interfaces;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using UglyToad.PdfPig;
 using static System.Net.Mime.MediaTypeNames;
@@ -16,16 +17,15 @@ namespace Online_Clinic.API.Services
             IFormFile cv = ConvertByteArrayToFormFile(cvAsBytes);
 
             string extractedText = ExtractTextFromPdf(cv);
-            //extractedText = extractedText.Replace("\r\n", "\n").Replace("\r", "\n").Replace("–", "-").Trim
             var experienceSection = ExtractExperienceSection(extractedText);
 
-            var regex = new Regex(@"(\d{4}-\d{4}|\d{4}\s*[-,]\s*(Present|დღემდე)?)\s*[-,\s]*\s*([^-\d]+(?:,\s*[^-\d]+)*)");
+            var regex = new Regex(@"(\d{4}\s*-\s*\d{4}|\d{4}\s*-\s*(Present|დღემდე)?)\s*[-,\s]*\s*([^\d]+(?:,\s*[^\d]+)*)");
             var matches = regex.Matches(experienceSection);
 
             foreach (Match match in matches)
             {
-                string timePeriod = match.Groups[1].Value;
-                string description = match.Groups[3].Value;
+                string timePeriod = match.Groups[1].Value.Trim();
+                string description = match.Groups[3].Value.Trim();
                 experiences[timePeriod] = description;
             }
 
@@ -59,18 +59,29 @@ namespace Online_Clinic.API.Services
 
         public string ExtractExperienceSection(string text)
         {
-            var keywords = new List<string> { "Experience", "Work History", "Employment History", "გამოცდილება" };
+            var startKeywords = new List<string> { "Experience", "History", "გამოცდილება" };
+            var endKeywords = new List<string> {"Education", "განათლება", "Skills", "უნარები", "  "};
 
-            foreach (var keyword in keywords)
+            foreach (var startkeyword in startKeywords)
             {
-                int startIndex = text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase);
-
-                if (startIndex > -1)
+                if (text.Contains(startkeyword))
                 {
-                    int startAfterKeyword = startIndex + keyword.Length;
-                    return text.Substring(startAfterKeyword).Trim();
+                    int startKeywordIndex = text.IndexOf(startkeyword) + startkeyword.Length;
+                    
+                    foreach (var endKeyword in endKeywords)
+                    {
+                        if(text.IndexOf(endKeyword, startKeywordIndex) != -1)
+                        {
+                            int endKeywordIndex = text.IndexOf(endKeyword, startKeywordIndex);
+
+                            return text.Substring(startKeywordIndex, endKeywordIndex - startKeywordIndex);
+                        }
+                    }
+
+                    return text.Substring(startKeywordIndex);
                 }
             }
+
             return string.Empty;
         }
     }
