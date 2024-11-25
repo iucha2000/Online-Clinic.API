@@ -103,7 +103,7 @@ namespace Online_Clinic.API.Controllers
         }
 
         [HttpGet("Parse-CV/{doctorId}")]
-        //[ResponseCache(Duration = 60)]
+        [ResponseCache(Duration = 60)]
         public IActionResult ParseCV(int doctorId)
         {
             byte[] cvData = _doctorRepository.GetCV(doctorId);

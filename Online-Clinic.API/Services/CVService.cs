@@ -11,7 +11,6 @@ namespace Online_Clinic.API.Services
 
         public Dictionary<string, string> ParseExperienceFromPdf(byte[] cvAsBytes)
         {
-            //TODO fix pattern matching for every scenario (and uncomment cache for experience parsing request)
             var experiences = new Dictionary<string, string>();
 
             IFormFile cv = ConvertByteArrayToFormFile(cvAsBytes);
