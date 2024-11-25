@@ -53,5 +53,13 @@ namespace Online_Clinic.API.Controllers
 
             return Ok(new { Message = "Password reset email sent successfully" });
         }
+
+        [HttpPost("Change-Password")]
+        public IActionResult ChangePassword(string email, string newPassword)
+        {
+            _accountRepository.UpdateUserPassword(email, newPassword);
+
+            return Ok(new { Message = "Password changed successfully" });
+        }
     }
 }
