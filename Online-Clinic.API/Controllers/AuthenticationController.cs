@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using My_Login_App.API.Auth;
+using Online_Clinic.API.DTOs;
 using Online_Clinic.API.Exceptions;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
@@ -55,9 +56,9 @@ namespace Online_Clinic.API.Controllers
         }
 
         [HttpPost("Change-Password")]
-        public IActionResult ChangePassword(string email, string newPassword)
+        public IActionResult ChangePassword(ChangePasswordRequest request)
         {
-            _accountRepository.UpdateUserPassword(email, newPassword);
+            _accountRepository.UpdateUserPassword(request.Email, request.Password);
 
             return Ok(new { Message = "Password changed successfully" });
         }
