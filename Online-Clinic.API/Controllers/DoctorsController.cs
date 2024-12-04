@@ -57,7 +57,7 @@ namespace Online_Clinic.API.Controllers
         }
 
         [HttpGet("Get-All-Doctors")]
-        [ResponseCache(Duration = 60)]
+        //[ResponseCache(Duration = 60)]
         public IActionResult GetAllDoctors()
         {
             List<Doctor> doctors = _doctorRepository.GetEntities();
