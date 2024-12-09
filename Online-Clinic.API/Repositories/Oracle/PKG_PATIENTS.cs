@@ -3,6 +3,7 @@ using Online_Clinic.API.Exceptions;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
 using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 using System.Data;
 
 namespace Online_Clinic.API.Repositories.Oracle
@@ -16,7 +17,7 @@ namespace Online_Clinic.API.Repositories.Oracle
             _accountRepository = accountRepository;
         }
 
-        public void AddEntity(Patient entity)
+        public int AddEntity(Patient entity)
         {
             if (_accountRepository.EmailExists(entity.Email))
             {
@@ -45,9 +46,18 @@ namespace Online_Clinic.API.Repositories.Oracle
             cmd.Parameters.Add("v_personal_id", OracleDbType.Varchar2).Value = entity.Personal_Id ?? (object)DBNull.Value;
             cmd.Parameters.Add("v_role", OracleDbType.Int32).Value = entity.Role.HasValue ? (int)entity.Role.Value : (object)DBNull.Value;
 
+            OracleParameter generatedIdParam = new OracleParameter("v_generated_id", OracleDbType.Int32);
+            generatedIdParam.Direction = ParameterDirection.Output;
+            cmd.Parameters.Add(generatedIdParam);
+
             cmd.ExecuteNonQuery();
 
+            int generatedId = Convert.ToInt32(((OracleDecimal)generatedIdParam.Value).ToInt32());
+            entity.Id = generatedId;
+
             conn.Close();
+
+            return generatedId;
         }
 
         public void UpdateEntity(int id, Patient entity)

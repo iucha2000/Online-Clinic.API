@@ -28,8 +28,8 @@ namespace Online_Clinic.API.Controllers
         public IActionResult AddDoctor(DoctorRequest doctorDto)
         {
             var doctor = _mapper.Map<Doctor>(doctorDto);
-             _doctorRepository.AddEntity(doctor);
-            return Ok();
+            int generatedId = _doctorRepository.AddEntity(doctor);
+            return Ok(generatedId);
         }
 
         [HttpPut("Update-Doctor/{id}")]

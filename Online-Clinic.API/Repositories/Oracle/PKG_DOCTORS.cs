@@ -21,7 +21,7 @@ namespace Online_Clinic.API.Repositories.Oracle
             _accountRepository = accountRepository;
         }
 
-        public void AddEntity(Doctor entity)
+        public int AddEntity(Doctor entity)
         {
             if (_accountRepository.EmailExists(entity.Email))
             {
@@ -52,9 +52,18 @@ namespace Online_Clinic.API.Repositories.Oracle
             cmd.Parameters.Add("v_category", OracleDbType.Int32).Value = entity.Category.HasValue ? (int)entity.Category.Value : (object)DBNull.Value;
             cmd.Parameters.Add("v_rating", OracleDbType.Int32).Value = entity.Rating.HasValue ? entity.Rating.Value : (object)DBNull.Value;
 
+            OracleParameter generatedIdParam = new OracleParameter("v_generated_id", OracleDbType.Int32);
+            generatedIdParam.Direction = ParameterDirection.Output;
+            cmd.Parameters.Add(generatedIdParam);
+
             cmd.ExecuteNonQuery();
 
+            int generatedId = Convert.ToInt32(((OracleDecimal)generatedIdParam.Value).ToInt32());
+            entity.Id = generatedId;
+
             conn.Close();
+
+            return generatedId;
         }
 
         public void UpdateEntity(int id, Doctor entity)

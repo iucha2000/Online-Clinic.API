@@ -25,8 +25,8 @@ namespace Online_Clinic.API.Controllers
         public IActionResult AddPatient(PatientRequest patientDto)
         {
             var patient = _mapper.Map<Patient>(patientDto);
-            _patientRepository.AddEntity(patient);
-            return Ok();
+            int generatedId = _patientRepository.AddEntity(patient);
+            return Ok(generatedId);
         }
 
         [HttpPut("Update-Patient/{id}")]

@@ -26,8 +26,8 @@ namespace Online_Clinic.API.Controllers
         public IActionResult AddReservation(ReservationDto reservationDto)
         {
             var reservation = _mapper.Map<Reservation>(reservationDto);
-            _reservationsRepository.AddEntity(reservation);
-            return Ok();
+            int generatedId = _reservationsRepository.AddEntity(reservation);
+            return Ok(generatedId);
         }
 
         [Authorize]

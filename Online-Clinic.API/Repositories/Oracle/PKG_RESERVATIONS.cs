@@ -3,6 +3,7 @@ using Online_Clinic.API.Exceptions;
 using Online_Clinic.API.Interfaces;
 using Online_Clinic.API.Models;
 using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 using System.Data;
 using System.Numerics;
 
@@ -20,7 +21,7 @@ namespace Online_Clinic.API.Repositories.Oracle
             _doctorRepository = doctorRepository;
         }
 
-        public void AddEntity(Reservation entity)
+        public int AddEntity(Reservation entity)
         {
             Patient patient = _patientRepository.GetEntity(entity.PatientId);
             Doctor doctor = _doctorRepository.GetEntity(entity.DoctorId);
@@ -40,9 +41,18 @@ namespace Online_Clinic.API.Repositories.Oracle
             cmd.Parameters.Add("v_description", OracleDbType.Varchar2).Value = entity.Description ?? (object)DBNull.Value;
             cmd.Parameters.Add("v_reservation_date", OracleDbType.Date).Value = entity.ReservationDate ?? (object)DBNull.Value;
 
+            OracleParameter generatedIdParam = new OracleParameter("v_generated_id", OracleDbType.Int32);
+            generatedIdParam.Direction = ParameterDirection.Output;
+            cmd.Parameters.Add(generatedIdParam);
+
             cmd.ExecuteNonQuery();
 
+            int generatedId = Convert.ToInt32(((OracleDecimal)generatedIdParam.Value).ToInt32());
+            entity.Id = generatedId;
+
             conn.Close();
+
+            return generatedId;
         }
 
         public void UpdateEntity(int id, Reservation entity)
