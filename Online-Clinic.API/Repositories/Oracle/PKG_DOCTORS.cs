@@ -167,7 +167,6 @@ namespace Online_Clinic.API.Repositories.Oracle
             }
 
             conn.Close();
-
             return doctor;
         }
 
@@ -295,6 +294,7 @@ namespace Online_Clinic.API.Repositories.Oracle
                 }
             }
 
+            conn.Close();  
             return imageData;
         }
 
