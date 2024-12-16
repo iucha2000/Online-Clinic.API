@@ -373,6 +373,7 @@ namespace Online_Clinic.API.Repositories.Oracle
                 }
             }
 
+            conn.Close();
             return cvData;
         }
 
@@ -405,7 +406,6 @@ namespace Online_Clinic.API.Repositories.Oracle
             }
 
             conn.Close();
-
             return categoryInfos;
         }
     }
