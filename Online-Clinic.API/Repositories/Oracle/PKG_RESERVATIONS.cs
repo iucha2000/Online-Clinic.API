@@ -25,6 +25,7 @@ namespace Online_Clinic.API.Repositories.Oracle
         {
             Patient patient = _patientRepository.GetEntity(entity.PatientId);
             Doctor doctor = _doctorRepository.GetEntity(entity.DoctorId);
+            entity.ReservationDate = entity.ReservationDate.Value.ToLocalTime();
 
             OracleConnection conn = new OracleConnection();
             conn.ConnectionString = ConnStr;
