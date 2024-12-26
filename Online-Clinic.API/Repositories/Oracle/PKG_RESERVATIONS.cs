@@ -27,6 +27,24 @@ namespace Online_Clinic.API.Repositories.Oracle
             Doctor doctor = _doctorRepository.GetEntity(entity.DoctorId);
             entity.ReservationDate = entity.ReservationDate.Value.ToLocalTime();
 
+            var existingPatientReservations = GetByPatientId(patient.Id);
+            foreach (var reservation in existingPatientReservations)
+            {
+                if(reservation.ReservationDate == entity.ReservationDate)
+                {
+                    throw new TimeslotReservedException($"User has existing reservation for {entity.ReservationDate}");
+                }
+            }
+
+            var existingDoctorReservations = GetByDoctorId(doctor.Id);
+            foreach (var reservation in existingDoctorReservations)
+            {
+                if (reservation.ReservationDate == entity.ReservationDate)
+                {
+                    throw new TimeslotReservedException($"Doctor has existing reservation for {entity.ReservationDate}");
+                }
+            }
+
             OracleConnection conn = new OracleConnection();
             conn.ConnectionString = ConnStr;
 
