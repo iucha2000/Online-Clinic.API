@@ -1,0 +1,371 @@
+//Doctors PKG
+create or replace package PKG_IURI_DOCTORS is
+
+       procedure add_doctor(v_firstname varchar2, v_lastname varchar2, v_email varchar2, v_password varchar2, v_personal_id varchar2, v_role number, v_category number, v_rating number, v_generated_id out number);
+       
+       procedure update_doctor(v_id number, v_firstname varchar2, v_lastname varchar2, v_email varchar2, v_password varchar2, v_personal_id varchar2, v_role number, v_category number, v_rating number);
+       
+       procedure delete_doctor(v_id number);
+       
+       procedure get_doctor_by_id(v_id number, v_result out sys_refcursor);
+       
+       procedure get_all_doctors(v_result out sys_refcursor);
+       
+       procedure get_doctor_by_email(v_email varchar2, v_result out sys_refcursor);
+       
+       procedure get_doctor_by_personal_id(v_personal_id varchar2, v_result out sys_refcursor);
+       
+       procedure add_image(v_id number, v_image blob);
+       
+       procedure get_image_by_doctor_id(v_id number, v_result out sys_refcursor);
+       
+       procedure add_cv(v_id number, v_cv blob);
+       
+       procedure get_cv_by_doctor_id(v_id number, v_result out sys_refcursor);
+       
+       procedure get_categories_count(v_result out sys_refcursor);
+
+
+end PKG_IURI_DOCTORS;
+
+create or replace package body PKG_IURI_DOCTORS is
+
+       procedure add_doctor(v_firstname varchar2, v_lastname varchar2, v_email varchar2, v_password varchar2, v_personal_id varchar2, v_role number, v_category number, v_rating number, v_generated_id out number) as
+         begin
+           insert into iuri_doctors
+             (firstname, lastname, email, password, personal_id, role, category, rating)
+           values
+             (v_firstname, v_lastname, v_email, v_password, v_personal_id, v_role, v_category, v_rating)
+           returning id into v_generated_id;
+         end;
+         
+         
+       procedure update_doctor(v_id number, v_firstname varchar2, v_lastname varchar2, v_email varchar2, v_password varchar2, v_personal_id varchar2, v_role number, v_category number, v_rating number) as
+         begin
+           update iuri_doctors
+              set firstname = NVL(v_firstname, firstname),
+                  lastname = NVL(v_lastname, lastname),
+                  email = NVL(v_email, email),
+                  password = NVL(v_password, password),
+                  personal_id = NVL(v_personal_id, personal_id),
+                  role = NVL(v_role, role),
+                  category = NVL(v_category, category),
+                  rating = NVL(v_rating, rating)
+            where id = v_id;
+         end;
+         
+         
+       procedure delete_doctor(v_id number) as 
+         begin
+           delete iuri_doctors
+            where id = v_id;
+         end;
+         
+         
+       procedure get_doctor_by_id(v_id number, v_result out sys_refcursor) as
+         begin
+            open v_result for
+               select d.firstname, d.lastname, d.email, d.password, d.personal_id, d.role, d.category, d.rating
+               from iuri_doctors d
+               where d.id = v_id;
+         end;
+         
+      
+       procedure get_all_doctors(v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select d.id, d.firstname, d.lastname, d.email, d.password, d.personal_id, d.role, d.category, d.rating
+               from iuri_doctors d
+               order by d.id asc;
+         end;
+         
+         
+       procedure get_doctor_by_email(v_email varchar2, v_result out sys_refcursor) as
+         begin
+            open v_result for
+               select d.id, d.firstname, d.lastname, d.email, d.password, d.personal_id, d.role, d.category, d.rating
+               from iuri_doctors d
+               where d.email = v_email;
+         end;
+         
+         
+       procedure get_doctor_by_personal_id(v_personal_id varchar2, v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select d.id, d.firstname, d.lastname, d.email, d.password, d.personal_id, d.role, d.category, d.rating
+               from iuri_doctors d
+               where d.personal_id = v_personal_id;
+         end;
+         
+         
+       procedure add_image(v_id number, v_image blob) as
+         begin
+           update iuri_doctors
+              set image = v_image
+            where id = v_id;
+         end;  
+         
+         
+       procedure get_image_by_doctor_id(v_id number, v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select d.image
+               from iuri_doctors d
+               where d.id = v_id;
+         end;
+         
+         
+       procedure add_cv(v_id number, v_cv blob) as
+         begin
+           update iuri_doctors
+              set cv = v_cv
+            where id = v_id;
+         end;
+         
+         
+       procedure get_cv_by_doctor_id(v_id number, v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select d.cv
+               from iuri_doctors d
+               where d.id = v_id;
+         end;
+         
+       procedure get_categories_count(v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select d.category, count(d.category) as category_count
+               from iuri_doctors d
+               group by d.category;
+         end;
+
+end PKG_IURI_DOCTORS;
+
+
+
+//Patients PKG
+create or replace package PKG_IURI_PATIENTS is
+
+       procedure add_patient(v_firstname varchar2, v_lastname varchar2, v_email varchar2, v_password varchar2, v_personal_id varchar2, v_role number, v_generated_id out number);
+       
+       procedure update_patient(v_id number, v_firstname varchar2, v_lastname varchar2, v_email varchar2, v_password varchar2, v_personal_id varchar2, v_role number);
+       
+       procedure delete_patient(v_id number);
+       
+       procedure get_patient_by_id(v_id number, v_result out sys_refcursor);
+       
+       procedure get_all_patients(v_result out sys_refcursor);
+       
+       procedure get_patient_by_email(v_email varchar2, v_result out sys_refcursor);
+       
+       procedure get_patient_by_personal_id(v_personal_id varchar2, v_result out sys_refcursor);
+       
+       procedure update_user_password(v_email varchar2, v_password varchar2);
+
+end PKG_IURI_PATIENTS;
+
+create or replace package body PKG_IURI_PATIENTS is
+
+       procedure add_patient(v_firstname varchar2, v_lastname varchar2, v_email varchar2, v_password varchar2, v_personal_id varchar2, v_role number, v_generated_id out number) as
+         begin
+           insert into iuri_patients
+             (firstname, lastname, email, password, personal_id, role)
+           values
+             (v_firstname, v_lastname, v_email, v_password, v_personal_id, v_role)
+           returning id into v_generated_id;
+         end;
+         
+       
+       procedure update_patient(v_id number, v_firstname varchar2, v_lastname varchar2, v_email varchar2, v_password varchar2, v_personal_id varchar2, v_role number) as
+         begin
+           update iuri_patients
+              set firstname = NVL(v_firstname, firstname),
+                  lastname = NVL(v_lastname, lastname),
+                  email = NVL(v_email, email),
+                  password = NVL(v_password, password),
+                  personal_id = NVL(v_personal_id, personal_id),
+                  role = NVL(v_role, role)
+            where id = v_id;
+         end;
+
+
+       procedure delete_patient(v_id number) as
+         begin
+           delete iuri_patients
+            where id = v_id;
+         end;
+       
+       
+       procedure get_patient_by_id(v_id number, v_result out sys_refcursor) as
+         begin
+            open v_result for
+               select p.firstname, p.lastname, p.email, p.password, p.personal_id, p.role
+               from iuri_patients p
+               where p.id = v_id;
+         end;
+         
+       procedure get_all_patients(v_result out sys_refcursor) as
+         begin
+           open v_result for
+                select p.id, p.firstname, p.lastname, p.email, p.password, p.personal_id, p.role
+                from iuri_patients p
+                order by p.id asc;
+         end;      
+         
+         
+       procedure get_patient_by_email(v_email varchar2, v_result out sys_refcursor) as
+         begin
+            open v_result for
+               select p.id, p.firstname, p.lastname, p.email, p.password, p.personal_id, p.role
+               from iuri_patients p
+               where p.email = v_email;
+         end;
+         
+         
+       procedure get_patient_by_personal_id(v_personal_id varchar2, v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select p.id, p.firstname, p.lastname, p.email, p.password, p.personal_id, p.role
+               from iuri_patients p
+               where p.personal_id = v_personal_id;
+         end;
+         
+         
+       procedure update_user_password(v_email varchar2, v_password varchar2) as
+         begin
+           update iuri_patients p
+           set p.password = v_password
+           where p.email = v_email;
+           
+           if SQL%ROWCOUNT = 0 then
+             update iuri_doctors d
+             set d.password = v_password
+             where d.email = v_email;
+           end if;
+         end;
+
+end PKG_IURI_PATIENTS;
+
+
+
+//Reservations PKG
+create or replace package PKG_IURI_RESERVATIONS is
+
+       procedure add_reservation(v_patientid number, v_doctorid number, v_description varchar2, v_reservation_date date, v_generated_id out number);
+       
+       procedure update_reservation(v_id number, v_patientid number, v_doctorid number, v_description varchar2, v_reservation_date date);
+       
+       procedure delete_reservation(v_id number);
+       
+       procedure get_reservation_by_id(v_id number, v_result out sys_refcursor);
+       
+       procedure get_all_reservations(v_result out sys_refcursor);
+       
+       procedure get_reservations_by_patient_id(v_patient_id number, v_result out sys_refcursor);
+       
+       procedure get_reservations_by_doctor_id(v_doctor_id number, v_result out sys_refcursor);
+
+end PKG_IURI_RESERVATIONS;
+
+create or replace package body PKG_IURI_RESERVATIONS is
+
+       procedure add_reservation(v_patientid number, v_doctorid number, v_description varchar2, v_reservation_date date, v_generated_id out number) as
+         begin
+           insert into iuri_reservations
+             (patientid, doctorid, description, reservation_date)
+           values
+             (v_patientid, v_doctorid, v_description, v_reservation_date)
+           returning id into v_generated_id;
+         end;
+         
+         
+       procedure update_reservation(v_id number, v_patientid number, v_doctorid number, v_description varchar2, v_reservation_date date) as
+         begin
+           update iuri_reservations
+              set patientid = NVL(v_patientid, patientid),
+                  doctorid = NVL(v_doctorid, doctorid),
+                  description = NVL(v_description, description),
+                  reservation_date = NVL(v_reservation_date, reservation_date)
+            where id = v_id;
+         end;
+         
+         
+       procedure delete_reservation(v_id number) as
+         begin
+           delete iuri_reservations
+            where id = v_id;
+         end;
+         
+         
+       procedure get_reservation_by_id(v_id number, v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select r.patientid, r.doctorid, r.description, r.reservation_date
+               from iuri_reservations r
+               where r.id = v_id;
+         end;
+         
+         
+       procedure get_all_reservations(v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select r.id, r.patientid, r.doctorid, r.description, r.reservation_date
+               from iuri_reservations r
+               order by r.id asc;
+         end;
+         
+         
+       procedure get_reservations_by_patient_id(v_patient_id number, v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select r.id, r.patientid, r.doctorid, r.description, r.reservation_date
+               from iuri_reservations r
+               where r.patientid = v_patient_id
+               order by r.id asc;
+         end;
+         
+         
+       procedure get_reservations_by_doctor_id(v_doctor_id number, v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select r.id, r.patientid, r.doctorid, r.description, r.reservation_date
+               from iuri_reservations r
+               where r.doctorid = v_doctor_id
+               order by r.id asc;
+         end;
+
+end PKG_IURI_RESERVATIONS;
+
+
+
+//Email_Confirmations PKG
+create or replace package PKG_IURI_EMAIL_CONFIRMATIONS is
+
+       procedure add_confirmation(v_email varchar, v_code number, v_expirytime date);
+       
+       procedure get_confirmation_by_email(v_email varchar, v_result out sys_refcursor);
+
+end PKG_IURI_EMAIL_CONFIRMATIONS;
+
+create or replace package body PKG_IURI_EMAIL_CONFIRMATIONS is
+
+       procedure add_confirmation(v_email varchar, v_code number, v_expirytime date) as
+         begin
+           insert into iuri_email_confirmations
+             (email, code, expirytime)
+           values
+             (v_email, v_code, v_expirytime);
+         end;
+         
+       procedure get_confirmation_by_email(v_email varchar, v_result out sys_refcursor) as
+         begin
+           open v_result for
+               select e.email, e.code, e.expirytime
+               from iuri_email_confirmations e
+               where e.email = v_email
+               order by e.expirytime desc;
+         end;
+         
+end PKG_IURI_EMAIL_CONFIRMATIONS;
+
+
